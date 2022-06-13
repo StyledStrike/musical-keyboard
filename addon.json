@@ -1,0 +1,12 @@
+{
+	"title": "Musical Keyboard",
+	"type": "entity",
+	"tags":	["roleplay", "realism"],
+	"ignore": [
+		".git*",
+		"*.txt",
+		"*.md",
+		"glualint.json",
+		"LICENSE"
+	]
+}

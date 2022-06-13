@@ -1,0 +1,6 @@
+"VertexlitGeneric"
+{
+	"$baseTexture" "models/styledstrike/musical_keyboard"
+	"$surfaceprop" "plastic"
+    "$model" "1"
+}
