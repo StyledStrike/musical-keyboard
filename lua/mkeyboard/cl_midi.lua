@@ -83,7 +83,6 @@ hook.Add('MIDI', 'mkeyboard_MIDI', function(_, code, p1, p2)
 		MKeyboard:NoteOn(p1, p2, true, midiChannel)
 
 	elseif midiCmd == 'NOTE_OFF' then
-		print(p2)
 		MKeyboard:NoteOff(p1)
 	end
 end)
