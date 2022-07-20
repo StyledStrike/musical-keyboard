@@ -83,3 +83,23 @@ net.Receive('mkeyboard.notes', function(_, ply)
 		MKeyboard:BroadcastNotes(notes, ent, automated, ply)
 	end
 end)
+
+-- hooks that only run serverside on single-player
+-- TODO: is there a better way to detect these hooks client-side?
+if game.SinglePlayer() then
+	util.AddNetworkString('mkeyboard.key')
+
+	hook.Add('PlayerButtonDown', 'mkeyboard_SPButtonDown', function(ply, button)
+		net.Start('mkeyboard.key', true)
+		net.WriteUInt(button, 8)
+		net.WriteBool(true)
+		net.Send(ply)
+	end)
+
+	hook.Add('PlayerButtonUp', 'mkeyboard_SPButtonUp', function(ply, button)
+		net.Start('mkeyboard.key', true)
+		net.WriteUInt(button, 8)
+		net.WriteBool(false)
+		net.Send(ply)
+	end)
+end

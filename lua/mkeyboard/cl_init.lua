@@ -1,32 +1,13 @@
-net.Receive('mkeyboard.set_entity', function()
-	local ent = net.ReadEntity()
+MKeyboard.entity = nil
 
-	MKeyboard:Shutdown()
+MKeyboard.reproduceQueue = {}
+MKeyboard.transmitQueue = {}
+MKeyboard.queueTimer = nil
+MKeyboard.queueStart = 0
 
-	if IsValid(ent) then
-		MKeyboard:Init(ent)
-	end
-end)
-
-net.Receive('mkeyboard.notes', function()
-	local ent = net.ReadEntity()
-	if not IsValid(ent) or not ent.EmitNote then return end
-
-	local automated = net.ReadBool()
-	local noteCount = net.ReadUInt(5)
-	local note, vel, instr, timeOffset
-
-	local t = SysTime()
-
-	for i = 1, noteCount do
-		note = net.ReadUInt(7)
-		vel = net.ReadUInt(7)
-		instr = net.ReadUInt(6)
-		timeOffset = net.ReadFloat()
-
-		MKeyboard.reproduceQueue[t + timeOffset] = { ent, note, vel, instr, automated }
-	end
-end)
+MKeyboard.shiftMode = false
+MKeyboard.noteState = {}
+MKeyboard.blockInput = 0
 
 -- settings & persistence
 MKeyboard.Settings = {
@@ -38,6 +19,38 @@ MKeyboard.Settings = {
 
 	channelInstruments = {},
 	drawKeyLabels = true
+}
+
+local shortcuts = {
+	[KEY_TAB] =	function()
+		RunConsoleCommand('keyboard_leave', MKeyboard.entity:EntIndex())
+	end,
+
+	[KEY_SPACE] = function()
+		MKeyboard.HUD:ToggleExpandedBar()
+	end,
+
+	[KEY_LEFT] = function()
+		MKeyboard.HUD:ChangeInstrument(-1)
+	end,
+
+	[KEY_RIGHT] = function()
+		MKeyboard.HUD:ChangeInstrument(1)
+	end,
+
+	[KEY_UP] = function()
+		MKeyboard.HUD:ChangeTranspose(1)
+	end,
+
+	[KEY_DOWN] = function()
+		MKeyboard.HUD:ChangeTranspose(-1)
+	end
+}
+
+local dontBlockBinds = {
+	['+attack'] = true,
+	['+attack2'] = true,
+	['+duck'] = true
 }
 
 local function ValidateInteger(n, min, max)
@@ -104,52 +117,9 @@ function MKeyboard:SaveSettings()
 	}, true))
 end
 
-MKeyboard.entity = nil
-
-MKeyboard.reproduceQueue = {}
-MKeyboard.transmitQueue = {}
-MKeyboard.queueTimer = nil
-MKeyboard.queueStart = 0
-
-MKeyboard.shiftMode = false
-MKeyboard.noteState = {}
-MKeyboard.blockInput = 0
-
-local shortcuts = {
-	[KEY_TAB] =	function()
-		RunConsoleCommand('keyboard_leave', MKeyboard.entity:EntIndex())
-	end,
-
-	[KEY_SPACE] = function()
-		MKeyboard.HUD:ToggleExpandedBar()
-	end,
-
-	[KEY_LEFT] = function()
-		MKeyboard.HUD:ChangeInstrument(-1)
-	end,
-
-	[KEY_RIGHT] = function()
-		MKeyboard.HUD:ChangeInstrument(1)
-	end,
-
-	[KEY_UP] = function()
-		MKeyboard.HUD:ChangeTranspose(1)
-	end,
-
-	[KEY_DOWN] = function()
-		MKeyboard.HUD:ChangeTranspose(-1)
-	end
-}
-
-local dontBlockBinds = {
-	['+attack'] = true,
-	['+attack2'] = true,
-	['+duck'] = true
-}
-
 function MKeyboard:Init(ent)
 	self.entity = ent
-	self.blockInput = RealTime() + 0.5
+	self.blockInput = RealTime() + 0.3
 
 	self.HUD:Init()
 
@@ -236,7 +206,7 @@ function MKeyboard:NoteOff(note)
 	self.noteState[note] = nil
 end
 
-function MKeyboard:Reproduce()
+function MKeyboard:ReproduceQueue()
 	local t = SysTime()
 
 	-- play the networked notes, keeping the original timings
@@ -287,8 +257,6 @@ function MKeyboard:Think()
 end
 
 function MKeyboard:OnButton(button, isPressed)
-	-- if gui.IsGameUIVisible() then return end
-
 	if button == KEY_LSHIFT then
 		self.shiftMode = isPressed
 	end
@@ -328,5 +296,47 @@ function MKeyboard:OnButton(button, isPressed)
 end
 
 hook.Add('Think', 'mkeyboard_OffscreenThink', function()
-	MKeyboard:Reproduce()
+	MKeyboard:ReproduceQueue()
 end)
+
+net.Receive('mkeyboard.set_entity', function()
+	local ent = net.ReadEntity()
+
+	MKeyboard:Shutdown()
+
+	if IsValid(ent) then
+		MKeyboard:Init(ent)
+	end
+end)
+
+net.Receive('mkeyboard.notes', function()
+	local ent = net.ReadEntity()
+	if not IsValid(ent) or not ent.EmitNote then return end
+
+	local automated = net.ReadBool()
+	local noteCount = net.ReadUInt(5)
+	local note, vel, instr, timeOffset
+
+	local t = SysTime()
+
+	for i = 1, noteCount do
+		note = net.ReadUInt(7)
+		vel = net.ReadUInt(7)
+		instr = net.ReadUInt(6)
+		timeOffset = net.ReadFloat()
+
+		MKeyboard.reproduceQueue[t + timeOffset] = { ent, note, vel, instr, automated }
+	end
+end)
+
+-- net event that only runs on single-player
+if game.SinglePlayer() then
+	net.Receive('mkeyboard.key', function()
+		local button = net.ReadUInt(8)
+		local pressed = net.ReadBool()
+
+		if IsValid(MKeyboard.entity) then
+			MKeyboard:OnButton(button, pressed)
+		end
+	end)
+end
