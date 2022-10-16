@@ -348,7 +348,12 @@ function HUD:Init()
 	self.rowOctave:SetValue(MKeyboard.Settings.octave)
 
 	self.rowOctave.DataChanged = function(_, val)
-		MKeyboard.Settings.octave = math.ceil(val)
+		if val < 0 then
+			MKeyboard.Settings.octave = math.ceil(val)
+		else
+			MKeyboard.Settings.octave = math.floor(val)
+		end
+
 		MKeyboard:SaveSettings()
 	end
 
