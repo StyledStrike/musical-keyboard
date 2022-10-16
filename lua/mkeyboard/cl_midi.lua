@@ -77,12 +77,13 @@ hook.Add('MIDI', 'mkeyboard_MIDI', function(_, code, p1, p2)
 	if not code then return end
 
 	local midiCmd = midi.GetCommandName(code)
+	local transpose = MKeyboard.Settings.midiTranspose
 
 	if midiCmd == 'NOTE_ON' and p2 > 0 then
 		local midiChannel = midi.GetCommandChannel(code)
-		MKeyboard:NoteOn(p1, p2, true, midiChannel)
+		MKeyboard:NoteOn(p1 + transpose, p2, true, midiChannel)
 
 	elseif midiCmd == 'NOTE_OFF' then
-		MKeyboard:NoteOff(p1)
+		MKeyboard:NoteOff(p1 + transpose)
 	end
 end)

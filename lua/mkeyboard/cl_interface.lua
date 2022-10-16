@@ -355,6 +355,7 @@ function HUD:Init()
 		end
 
 		MKeyboard:SaveSettings()
+		MKeyboard:NoteOffAll()
 	end
 
 	local rDevices = propertyPanel:CreateRow('MIDI', langGet('mk.midi.device'))
@@ -375,6 +376,16 @@ function HUD:Init()
 		if table.Count(midi.GetPorts()) == 0 then
 			rDevices:SetValue(langGet('mk.midi.nodevices'))
 			rDevices:SetEnabled(false)
+		end
+
+		local midiTranspose = propertyPanel:CreateRow('MIDI', langGet('mk.vkeys.transpose'))
+		midiTranspose:Setup('Int', {min = -48, max = 48})
+		midiTranspose:SetValue(MKeyboard.Settings.midiTranspose)
+
+		midiTranspose.DataChanged = function(_, val)
+			MKeyboard.Settings.midiTranspose = math.Round(val)
+			MKeyboard:SaveSettings()
+			MKeyboard:NoteOffAll()
 		end
 	else
 		rDevices:SetValue(langGet('mk.midi.nomodule'))

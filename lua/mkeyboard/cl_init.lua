@@ -16,6 +16,7 @@ MKeyboard.Settings = {
 	sheet = 0,
 	velocity = 127,
 	octave = 0,
+	midiTranspose = 0,
 
 	channelInstruments = {},
 	drawKeyLabels = true
@@ -89,6 +90,11 @@ function MKeyboard:LoadSettings()
 		self.Settings.octave = ValidateInteger(data.octave, -3, 3)
 	end
 
+	-- last transpose that was used with midi
+	if data.midiTranspose then
+		self.Settings.midiTranspose = ValidateInteger(data.midiTranspose, -48, 48)
+	end
+
 	-- links between instruments and MIDI channels
 	if data.channelInstruments and type(data.channelInstruments) == 'table' then
 		for c, i in pairs(data.channelInstruments) do
@@ -112,6 +118,7 @@ function MKeyboard:SaveSettings()
 		sheet				= s.sheet,
 		velocity			= s.velocity,
 		octave				= s.octave,
+		midiTranspose		= s.midiTranspose,
 		channelInstruments	= s.channelInstruments,
 		drawKeyLabels		= s.drawKeyLabels
 	}, true))
@@ -183,7 +190,7 @@ function MKeyboard:NoteOn(note, velocity, isMidi, midiChannel)
 
 	self.entity:EmitNote(note, velocity, 80, instrument, isMidi)
 
-	self.noteState[note] = isMidi and 4 or 3 -- see themeColors on cl_hud.lua 
+	self.noteState[note] = isMidi and 4 or 3 -- see themeColors on cl_interface.lua 
 	self.lastNoteWasAutomated = isMidi
 
 	-- remember when we started putting notes
@@ -204,6 +211,12 @@ end
 
 function MKeyboard:NoteOff(note)
 	self.noteState[note] = nil
+end
+
+function MKeyboard:NoteOffAll()
+	for k, _ in pairs(self.noteState) do
+		self.noteState[k] = nil
+	end
 end
 
 function MKeyboard:ReproduceQueue()
