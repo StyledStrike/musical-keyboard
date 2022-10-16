@@ -105,22 +105,22 @@ local function drawKeyboard(x, y, h)
 
 	local layoutData = MKeyboard.Layouts[MKeyboard.Settings.layout]
 	local instrumentData = MKeyboard.Instruments[MKeyboard.Settings.instrument]
-	local transpose = MKeyboard.Settings.transpose
+	local octave = MKeyboard.Settings.octave
 
-	if transpose ~= 0 then
+	if octave ~= 0 then
 		surface.SetFont('MKeyboard_Key')
 		local offsetX = surface.GetTextSize(layoutData.name)
 
 		surface.SetTextPos(x + offsetX + borderSize * 2, y - infoSize + borderSize)
 		surface.SetTextColor(255, 208, 22)
-		surface.DrawText(transpose > 0 and '+' .. transpose or transpose)
+		surface.DrawText(octave > 0 and '+' .. octave or octave)
 	end
 
 	simpleText(layoutData.name, 'MKeyboard_Key', x + borderSize, y - infoSize + borderSize, themeColors[2])
 	simpleText(instrumentData.name, 'MKeyboard_Key',
 		x + w - borderSize, y - infoSize + borderSize, themeColors[2], TEXT_ALIGN_RIGHT)
 
-	local noteOffset = transpose * 12
+	local noteOffset = octave * 12
 	local noteState = MKeyboard.noteState
 	local minNote = instrumentData.firstNote
 	local maxNote = instrumentData.lastNote
@@ -315,12 +315,12 @@ function HUD:Init()
 		MKeyboard.Settings.layout = val
 		MKeyboard.Settings.sheet = 0
 
-		local limits = MKeyboard.Layouts[val].transpose
-		MKeyboard.Settings.transpose = math.Clamp(MKeyboard.Settings.transpose, limits.min, limits.max)
+		local limits = MKeyboard.Layouts[val].octaveLimits
+		MKeyboard.Settings.octave = math.Clamp(MKeyboard.Settings.octave, limits.min, limits.max)
 		MKeyboard:SaveSettings()
 
-		self.rowTranspose:Setup('Int', {min = limits.min, max = limits.max})
-		self.rowTranspose:SetValue(MKeyboard.Settings.transpose)
+		self.rowOctave:Setup('Int', {min = limits.min, max = limits.max})
+		self.rowOctave:SetValue(MKeyboard.Settings.octave)
 		self:UpdateLayout()
 	end
 
@@ -341,14 +341,14 @@ function HUD:Init()
 		MKeyboard.Settings.velocity = math.ceil(val)
 	end
 
-	local layoutLimits = MKeyboard.Layouts[MKeyboard.Settings.layout].transpose
+	local octaveLimits = MKeyboard.Layouts[MKeyboard.Settings.layout].octaveLimits
 
-	self.rowTranspose = propertyPanel:CreateRow(langGet('mk.vkeys'), langGet('mk.vkeys.transpose'))
-	self.rowTranspose:Setup('Int', {min = layoutLimits.min, max = layoutLimits.max})
-	self.rowTranspose:SetValue(MKeyboard.Settings.transpose)
+	self.rowOctave = propertyPanel:CreateRow(langGet('mk.vkeys'), langGet('mk.vkeys.octave'))
+	self.rowOctave:Setup('Int', {min = octaveLimits.min, max = octaveLimits.max})
+	self.rowOctave:SetValue(MKeyboard.Settings.octave)
 
-	self.rowTranspose.DataChanged = function(_, val)
-		MKeyboard.Settings.transpose = math.ceil(val)
+	self.rowOctave.DataChanged = function(_, val)
+		MKeyboard.Settings.octave = math.ceil(val)
 		MKeyboard:SaveSettings()
 	end
 
@@ -493,23 +493,23 @@ function HUD:ChangeInstrument(to)
 	MKeyboard:SaveSettings()
 end
 
-function HUD:ChangeTranspose(to)
-	local newTranspose = MKeyboard.Settings.transpose + to
-	local limits = MKeyboard.Layouts[MKeyboard.Settings.layout].transpose
+function HUD:AddOctave(value)
+	local newOctave = MKeyboard.Settings.octave + value
+	local limits = MKeyboard.Layouts[MKeyboard.Settings.layout].octaveLimits
 
-	if newTranspose < limits.min then
-		newTranspose = limits.max
+	if newOctave < limits.min then
+		newOctave = limits.max
 	end
 
-	if newTranspose > limits.max then
-		newTranspose = limits.min
+	if newOctave > limits.max then
+		newOctave = limits.min
 	end
 
-	MKeyboard.Settings.transpose = newTranspose
+	MKeyboard.Settings.octave = newOctave
 	MKeyboard.noteState = {}
 
 	self:UpdateLayout()
-	self.rowTranspose:SetValue(newTranspose)
+	self.rowOctave:SetValue(newOctave)
 
 	MKeyboard:SaveSettings()
 end

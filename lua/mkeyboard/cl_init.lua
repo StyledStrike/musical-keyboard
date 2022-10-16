@@ -15,7 +15,7 @@ MKeyboard.Settings = {
 	instrument = 1,
 	sheet = 0,
 	velocity = 127,
-	transpose = 0,
+	octave = 0,
 
 	channelInstruments = {},
 	drawKeyLabels = true
@@ -39,11 +39,11 @@ local shortcuts = {
 	end,
 
 	[KEY_UP] = function()
-		MKeyboard.HUD:ChangeTranspose(1)
+		MKeyboard.HUD:AddOctave(1)
 	end,
 
 	[KEY_DOWN] = function()
-		MKeyboard.HUD:ChangeTranspose(-1)
+		MKeyboard.HUD:AddOctave(-1)
 	end
 }
 
@@ -84,9 +84,9 @@ function MKeyboard:LoadSettings()
 		self.Settings.velocity = ValidateInteger(data.velocity, 1, 127)
 	end
 
-	-- last transpose that was used on the keyboard
-	if data.transpose then
-		self.Settings.transpose = ValidateInteger(data.transpose, -3, 3)
+	-- last octave that was used on the keyboard
+	if data.octave then
+		self.Settings.octave = ValidateInteger(data.octave, -3, 3)
 	end
 
 	-- links between instruments and MIDI channels
@@ -111,7 +111,7 @@ function MKeyboard:SaveSettings()
 		instrument			= s.instrument,
 		sheet				= s.sheet,
 		velocity			= s.velocity,
-		transpose			= s.transpose,
+		octave				= s.octave,
 		channelInstruments	= s.channelInstruments,
 		drawKeyLabels		= s.drawKeyLabels
 	}, true))
@@ -276,7 +276,7 @@ function MKeyboard:OnButton(button, isPressed)
 		-- params: key [1], note [2], type [3], label [4], require SHIFT [5], alternative key [6]
 
 		if params[1] == button or (params[6] and params[6] == button) then
-			local note = params[2] + self.Settings.transpose * 12
+			local note = params[2] + self.Settings.octave * 12
 
 			if isPressed then
 				if params[5] and self.shiftMode then

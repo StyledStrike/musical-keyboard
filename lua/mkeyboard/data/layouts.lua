@@ -1,10 +1,10 @@
 MKeyboard.Layouts = {}
 
-function MKeyboard:RegisterLayout(name, keys, transpose)
+function MKeyboard:RegisterLayout(name, keys, octaveLimits)
 	self.Layouts[#self.Layouts + 1] = {
 		name = name,
 		keys = keys,
-		transpose = transpose
+		octaveLimits = octaveLimits
 	}
 end
 
