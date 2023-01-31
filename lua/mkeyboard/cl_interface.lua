@@ -1,13 +1,13 @@
-surface.CreateFont( 'MKeyboard_Title', {
-    size = ScrH() * 0.025, weight = 300, antialias = true, font = 'Coolvetica'
+surface.CreateFont( "MKeyboard_Title", {
+    size = ScrH() * 0.025, weight = 300, antialias = true, font = "Coolvetica"
 } )
 
-surface.CreateFont( 'MKeyboard_Key', {
-    size = ScrH() * 0.02, weight = 300, antialias = true, font = 'Coolvetica'
+surface.CreateFont( "MKeyboard_Key", {
+    size = ScrH() * 0.02, weight = 300, antialias = true, font = "Coolvetica"
 } )
 
-surface.CreateFont( 'MKeyboard_Sheet', {
-    size = ScrH() * 0.022, antialias = true, font = 'Roboto'
+surface.CreateFont( "MKeyboard_Sheet", {
+    size = ScrH() * 0.022, antialias = true, font = "Roboto"
 } )
 
 local setDrawColor = surface.SetDrawColor
@@ -46,9 +46,9 @@ function DPropertyButton:Init() end
 function DPropertyButton:Setup( label )
     self:Clear()
 
-    label = label or ''
+    label = label or ""
 
-    local btn = self:Add( 'DButton' )
+    local btn = self:Add( "DButton" )
     btn:Dock( FILL )
     btn:SetText( label )
 
@@ -69,7 +69,7 @@ function DPropertyButton:Setup( label )
     end
 end
 
-derma.DefineControl( 'DProperty_Button', '', DPropertyButton, 'DProperty_Generic' )
+derma.DefineControl( "DProperty_Button", "", DPropertyButton, "DProperty_Generic" )
 
 local keyStateColors = {
     -- state = background color
@@ -93,11 +93,11 @@ local function drawKey( x, y, w, h, state, label, sublabel, rounded )
     local labelColor = rounded and colors.white or colors.black
 
     if label then
-        simpleText( label, 'MKeyboard_Key', x + ( w * 0.5 ), y + h - 2, labelColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM )
+        simpleText( label, "MKeyboard_Key", x + ( w * 0.5 ), y + h - 2, labelColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM )
     end
 
     if sublabel then
-        simpleText( sublabel, 'MKeyboard_Key', x + ( w * 0.5 ), y + h - 22, labelColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM )
+        simpleText( sublabel, "MKeyboard_Key", x + ( w * 0.5 ), y + h - 22, labelColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM )
     end
 end
 
@@ -117,16 +117,16 @@ local function drawKeyboard( x, y, h )
     local octave = settings.octave
 
     if octave ~= 0 then
-        surface.SetFont( 'MKeyboard_Key' )
+        surface.SetFont( "MKeyboard_Key" )
         local offsetX = surface.GetTextSize( layoutData.name )
 
         surface.SetTextPos( x + offsetX + borderSize * 2, y - infoSize + borderSize )
         surface.SetTextColor( 255, 208, 22 )
-        surface.DrawText( octave > 0 and '+' .. octave or octave )
+        surface.DrawText( octave > 0 and "+" .. octave or octave )
     end
 
-    simpleText( layoutData.name, 'MKeyboard_Key', x + borderSize, y - infoSize + borderSize, colors.white )
-    simpleText( instrumentData.name, 'MKeyboard_Key', x + w - borderSize, y - infoSize + borderSize, colors.white, TEXT_ALIGN_RIGHT )
+    simpleText( layoutData.name, "MKeyboard_Key", x + borderSize, y - infoSize + borderSize, colors.white )
+    simpleText( instrumentData.name, "MKeyboard_Key", x + w - borderSize, y - infoSize + borderSize, colors.white, TEXT_ALIGN_RIGHT )
 
     local noteOffset = octave * 12
     local noteStates = MKeyboard.noteStates
@@ -138,17 +138,17 @@ local function drawKeyboard( x, y, h )
     local keyX = x
 
     for _, params in ipairs( layoutData.keys ) do
-        if params[3] == 'b' then continue end
+        if params[3] == "b" then continue end
 
         local note = params[2] + noteOffset
         local state = noteStates[note]
 
         if note < minNote or note > maxNote then
-            drawKey( keyX + whiteKeyBorder, y, keyWidth - whiteKeyBorder * 2, h, 'disabled' )
+            drawKey( keyX + whiteKeyBorder, y, keyWidth - whiteKeyBorder * 2, h, "disabled" )
         elseif state then
             drawKey( keyX + whiteKeyBorder, y, keyWidth - whiteKeyBorder * 2, h, state, params[4], params[7] )
         else
-            drawKey( keyX + whiteKeyBorder, y, keyWidth - whiteKeyBorder * 2, h, 'off_white', params[4], params[7] )
+            drawKey( keyX + whiteKeyBorder, y, keyWidth - whiteKeyBorder * 2, h, "off_white", params[4], params[7] )
         end
 
         keyX = keyX + keyWidth
@@ -159,7 +159,7 @@ local function drawKeyboard( x, y, h )
     local bWidth, bHeight = keyWidth * 0.6, h * 0.64
 
     for _, params in ipairs( layoutData.keys ) do
-        if params[3] == 'w' then
+        if params[3] == "w" then
             keyX = keyX + keyWidth
             continue
         end
@@ -168,11 +168,11 @@ local function drawKeyboard( x, y, h )
         local state = noteStates[note]
 
         if note < minNote or note > maxNote then
-            drawKey( keyX - ( bWidth * 0.5 ), y, bWidth, bHeight, 'disabled' )
+            drawKey( keyX - ( bWidth * 0.5 ), y, bWidth, bHeight, "disabled" )
         elseif state then
             drawKey( keyX - ( bWidth * 0.5 ), y, bWidth, bHeight, state, params[4], params[7], true )
         else
-            drawKey( keyX - ( bWidth * 0.5 ), y, bWidth, bHeight, 'off_black', params[4], params[7], true )
+            drawKey( keyX - ( bWidth * 0.5 ), y, bWidth, bHeight, "off_black", params[4], params[7], true )
         end
     end
 end
@@ -182,7 +182,7 @@ local function drawSheet( index, x, y )
     local titleBarSize = ScrH() * 0.028
     local data = MKeyboard.sheets[index]
 
-    surface.SetFont( 'MKeyboard_Sheet' )
+    surface.SetFont( "MKeyboard_Sheet" )
 
     local sheetW, sheetH = surface.GetTextSize( data.sequence )
     local w, h = math.max( ScrW() * 0.3, sheetW + borderSize * 2 ), sheetH + titleBarSize * 0.5
@@ -194,8 +194,8 @@ local function drawSheet( index, x, y )
     setDrawColor( 0, 0, 0, 254 )
     drawRect( x, y, w, h )
 
-    draw.DrawText( data.sequence, 'MKeyboard_Sheet', x + w * 0.5, y + titleBarSize, nil, TEXT_ALIGN_CENTER )
-    simpleText( data.title, 'MKeyboard_Title', x + w * 0.5, y + borderSize, colors.white, TEXT_ALIGN_CENTER )
+    draw.DrawText( data.sequence, "MKeyboard_Sheet", x + w * 0.5, y + titleBarSize, nil, TEXT_ALIGN_CENTER )
+    simpleText( data.title, "MKeyboard_Title", x + w * 0.5, y + borderSize, colors.white, TEXT_ALIGN_CENTER )
 
     DisableClipping( oldClipping )
 end
@@ -204,7 +204,7 @@ local function createCategoryPanel( title, parent, dock, wide, help )
     local dockPadding = ScrH() * 0.01
     local dSkin = derma.GetDefaultSkin()
 
-    local pnl = vgui.Create( 'DPanel', parent )
+    local pnl = vgui.Create( "DPanel", parent )
     pnl:DockPadding( dockPadding, dockPadding, dockPadding, dockPadding )
     pnl:Dock( dock )
 
@@ -218,20 +218,20 @@ local function createCategoryPanel( title, parent, dock, wide, help )
         s.oldPaint( s, sw - 4, sh )
     end
 
-    local pnlHeader = vgui.Create( 'DPanel', pnl )
+    local pnlHeader = vgui.Create( "DPanel", pnl )
     pnlHeader:Dock( TOP )
     pnlHeader:SetPaintBackground( false )
 
-    local lblTitle = vgui.Create( 'DLabel', pnlHeader )
-    lblTitle:SetFont( 'MKeyboard_Key' )
+    local lblTitle = vgui.Create( "DLabel", pnlHeader )
+    lblTitle:SetFont( "MKeyboard_Key" )
     lblTitle:SetText( title )
     lblTitle:SizeToContents()
     lblTitle:Dock( LEFT )
     lblTitle:SetTextColor( dSkin.Colours.Label.Dark )
 
     if help then
-        local lblHelp = vgui.Create( 'DLabel', pnlHeader )
-        lblHelp:SetFont( 'MKeyboard_Key' )
+        local lblHelp = vgui.Create( "DLabel", pnlHeader )
+        lblHelp:SetFont( "MKeyboard_Key" )
         lblHelp:SetText( help )
         lblHelp:SizeToContents()
         lblHelp:Dock( RIGHT )
@@ -249,10 +249,10 @@ function uiHandler:Init()
     local wide = ScrW() * 0.7
     local tall = ScrH() * 0.5
 
-    self.frameKeyboard = vgui.Create( 'DFrame' )
+    self.frameKeyboard = vgui.Create( "DFrame" )
     self.frameKeyboard:SetPos( ( ScrW() - wide ) * 0.5, ScrH() - tall * 0.5 )
     self.frameKeyboard:SetSize( wide, tall )
-    self.frameKeyboard:SetTitle( '' )
+    self.frameKeyboard:SetTitle( "" )
     self.frameKeyboard:SetDeleteOnClose( true )
     self.frameKeyboard:SetDraggable( false )
     self.frameKeyboard:SetSizable( false )
@@ -269,8 +269,8 @@ function uiHandler:Init()
     end
 
     local helpMessage = {
-        [false] = langGet( 'mk.help.open' ),
-        [true] = langGet( 'mk.help.close' ),
+        [false] = langGet( "mk.help.open" ),
+        [true] = langGet( "mk.help.close" ),
     }
 
     self.frameKeyboard.Paint = function( _, sw, sh )
@@ -278,13 +278,13 @@ function uiHandler:Init()
         roundedBoxEx( 8, 0, sh * 0.4, sw, sh * 0.6, colors.bg, true, true, false, false )
 
         if self.openPortName then
-            simpleText( self.openPortName, 'MKeyboard_Title', sw - ( sw * 0.01 ), sh * 0.43,
+            simpleText( self.openPortName, "MKeyboard_Title", sw - ( sw * 0.01 ), sh * 0.43,
                 colors.white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP )
 
-            simpleText( helpMessage[self.expanded], 'MKeyboard_Title', sw * 0.01, sh * 0.43,
+            simpleText( helpMessage[self.expanded], "MKeyboard_Title", sw * 0.01, sh * 0.43,
                 colors.white, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
         else
-            simpleText( helpMessage[self.expanded], 'MKeyboard_Title', sw * 0.5, sh * 0.43,
+            simpleText( helpMessage[self.expanded], "MKeyboard_Title", sw * 0.5, sh * 0.43,
                 colors.white, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
         end
 
@@ -293,15 +293,15 @@ function uiHandler:Init()
         end
     end
 
-    local pnlParent = vgui.Create( 'DPanel', self.frameKeyboard )
+    local pnlParent = vgui.Create( "DPanel", self.frameKeyboard )
     pnlParent:SetPos( wide * 0.01, tall * 0.52 )
     pnlParent:SetSize( wide * 0.98, tall * 0.45 )
     pnlParent:DockPadding( 0, 0, 0, 0 )
     pnlParent:SetPaintBackground( false )
 
-    local pnlSettings = createCategoryPanel( langGet( 'mk.settings' ), pnlParent, LEFT, wide * 0.3 )
+    local pnlSettings = createCategoryPanel( langGet( "mk.settings" ), pnlParent, LEFT, wide * 0.3 )
 
-    local propertyPanel = vgui.Create( 'DProperties', pnlSettings )
+    local propertyPanel = vgui.Create( "DProperties", pnlSettings )
     propertyPanel:Dock( FILL )
     propertyPanel:DockMargin( 0, 8, 0, 0 )
 
@@ -311,9 +311,9 @@ function uiHandler:Init()
         layoutValues[v.name] = k
     end
 
-    local rLayouts = propertyPanel:CreateRow( langGet( 'mk.vkeys' ), langGet( 'mk.layout' ) )
-    rLayouts:Setup( 'Combo', {
-        text = 'Select a layout...',
+    local rLayouts = propertyPanel:CreateRow( langGet( "mk.vkeys" ), langGet( "mk.layout" ) )
+    rLayouts:Setup( "Combo", {
+        text = "Select a layout...",
         values = layoutValues
     } )
 
@@ -327,13 +327,13 @@ function uiHandler:Init()
         settings.octave = math.Clamp( settings.octave, limits.min, limits.max )
         MKeyboard:SaveSettings()
 
-        self.rowOctave:Setup( 'Int', { min = limits.min, max = limits.max } )
+        self.rowOctave:Setup( "Int", { min = limits.min, max = limits.max } )
         self.rowOctave:SetValue( settings.octave )
         self:UpdateLayout()
     end
 
-    local rDrawLabels = propertyPanel:CreateRow( langGet( 'mk.vkeys' ), langGet( 'mk.vkeys.labels' ) )
-    rDrawLabels:Setup( 'Boolean' )
+    local rDrawLabels = propertyPanel:CreateRow( langGet( "mk.vkeys" ), langGet( "mk.vkeys.labels" ) )
+    rDrawLabels:Setup( "Boolean" )
     rDrawLabels:SetValue( settings.drawKeyLabels )
 
     rDrawLabels.DataChanged = function( _, val )
@@ -341,8 +341,8 @@ function uiHandler:Init()
         MKeyboard:SaveSettings()
     end
 
-    local rVelocity = propertyPanel:CreateRow( langGet( 'mk.vkeys' ), langGet( 'mk.vkeys.velocity' ) )
-    rVelocity:Setup( 'Int', { min = 1, max = 127 } )
+    local rVelocity = propertyPanel:CreateRow( langGet( "mk.vkeys" ), langGet( "mk.vkeys.velocity" ) )
+    rVelocity:Setup( "Int", { min = 1, max = 127 } )
     rVelocity:SetValue( settings.velocity )
 
     rVelocity.DataChanged = function( _, val )
@@ -351,8 +351,8 @@ function uiHandler:Init()
 
     local octaveLimits = MKeyboard.layouts[settings.layout].octaveLimits
 
-    self.rowOctave = propertyPanel:CreateRow( langGet( 'mk.vkeys' ), langGet( 'mk.vkeys.octave' ) )
-    self.rowOctave:Setup( 'Int', { min = octaveLimits.min, max = octaveLimits.max } )
+    self.rowOctave = propertyPanel:CreateRow( langGet( "mk.vkeys" ), langGet( "mk.vkeys.octave" ) )
+    self.rowOctave:Setup( "Int", { min = octaveLimits.min, max = octaveLimits.max } )
     self.rowOctave:SetValue( settings.octave )
 
     self.rowOctave.DataChanged = function( _, val )
@@ -366,12 +366,12 @@ function uiHandler:Init()
         MKeyboard:NoteOffAll()
     end
 
-    local rDevices = propertyPanel:CreateRow( 'MIDI', langGet( 'mk.midi.device' ) )
-    rDevices:Setup( 'Button', langGet( 'mk.midi.device.choose' ) )
+    local rDevices = propertyPanel:CreateRow( "MIDI", langGet( "mk.midi.device" ) )
+    rDevices:Setup( "Button", langGet( "mk.midi.device.choose" ) )
 
     if midi then
-        local rChannels = propertyPanel:CreateRow( 'MIDI', langGet( 'mk.midi.channels' ) )
-        rChannels:Setup( 'Button', langGet( 'mk.midi.channels.setup' ) )
+        local rChannels = propertyPanel:CreateRow( "MIDI", langGet( "mk.midi.channels" ) )
+        rChannels:Setup( "Button", langGet( "mk.midi.channels.setup" ) )
 
         rChannels.OnClick = function()
             self:ShowChannelsDialog()
@@ -382,12 +382,12 @@ function uiHandler:Init()
         end
 
         if table.Count( midi.GetPorts() ) == 0 then
-            rDevices:SetValue( langGet( 'mk.midi.nodevices' ) )
+            rDevices:SetValue( langGet( "mk.midi.nodevices" ) )
             rDevices:SetEnabled( false )
         end
 
-        local midiTranspose = propertyPanel:CreateRow( 'MIDI', langGet( 'mk.vkeys.transpose' ) )
-        midiTranspose:Setup( 'Int', { min = -48, max = 48 } )
+        local midiTranspose = propertyPanel:CreateRow( "MIDI", langGet( "mk.vkeys.transpose" ) )
+        midiTranspose:Setup( "Int", { min = -48, max = 48 } )
         midiTranspose:SetValue( settings.midiTranspose )
 
         midiTranspose.DataChanged = function( _, val )
@@ -396,11 +396,11 @@ function uiHandler:Init()
             MKeyboard:NoteOffAll()
         end
     else
-        rDevices:SetValue( langGet( 'mk.midi.nomodule' ) )
+        rDevices:SetValue( langGet( "mk.midi.nomodule" ) )
         rDevices:SetEnabled( false )
 
-        local rInstallHelp = propertyPanel:CreateRow( 'MIDI', 'Module installation' )
-        rInstallHelp:Setup( 'Button', langGet( 'mk.midi.guide' ) )
+        local rInstallHelp = propertyPanel:CreateRow( "MIDI", "Module installation" )
+        rInstallHelp:Setup( "Button", langGet( "mk.midi.guide" ) )
 
         rInstallHelp.OnClick = function()
             gui.OpenURL( MKeyboard.URL_MIDI_GUIDE )
@@ -408,18 +408,18 @@ function uiHandler:Init()
         end
     end
 
-    local pnlInstruments = createCategoryPanel( langGet( 'mk.instruments' ), pnlParent, FILL, nil, langGet( 'mk.instruments.help' ) )
+    local pnlInstruments = createCategoryPanel( langGet( "mk.instruments" ), pnlParent, FILL, nil, langGet( "mk.instruments.help" ) )
 
-    self.instrList = vgui.Create( 'DListView', pnlInstruments )
+    self.instrList = vgui.Create( "DListView", pnlInstruments )
     self.instrList:Dock( FILL )
     self.instrList:DockMargin( 0, 8, 0, 0 )
-    self.instrList:AddColumn( langGet( 'mk.instruments' ) )
+    self.instrList:AddColumn( langGet( "mk.instruments" ) )
     self.instrList:SetMultiSelect( false )
     self.instrList:SetHideHeaders( true )
     self.instrList:SetSortable( false )
 
     for i, v in ipairs( MKeyboard.instruments ) do
-        self.instrList:AddLine( i .. ' - ' .. v.name )
+        self.instrList:AddLine( i .. " - " .. v.name )
     end
 
     self.instrList:SelectItem( self.instrList:GetLine( settings.instrument ) )
@@ -429,12 +429,12 @@ function uiHandler:Init()
         MKeyboard:SaveSettings()
     end
 
-    local pnlSheets = createCategoryPanel( langGet( 'mk.sheets' ), pnlParent, RIGHT, wide * 0.3 )
+    local pnlSheets = createCategoryPanel( langGet( "mk.sheets" ), pnlParent, RIGHT, wide * 0.3 )
 
-    self.sheetList = vgui.Create( 'DListView', pnlSheets )
+    self.sheetList = vgui.Create( "DListView", pnlSheets )
     self.sheetList:Dock( FILL )
     self.sheetList:DockMargin( 0, 8, 0, 0 )
-    self.sheetList:AddColumn( langGet( 'mk.sheets' ) )
+    self.sheetList:AddColumn( langGet( "mk.sheets" ) )
     self.sheetList:SetMultiSelect( false )
     self.sheetList:SetHideHeaders( true )
     self.sheetList:SetSortable( false )
@@ -465,14 +465,14 @@ function uiHandler:UpdateLayout()
     local layoutKeys = MKeyboard.layouts[layout].keys
 
     for _, params in ipairs( layoutKeys ) do
-        if params[3] == 'w' then
+        if params[3] == "w" then
             self.whiteKeyCount = self.whiteKeyCount + 1
         end
     end
 
     self.sheetList:Clear()
 
-    local shouldSelect = self.sheetList:AddLine( langGet( 'mk.sheets.hidden' ) )
+    local shouldSelect = self.sheetList:AddLine( langGet( "mk.sheets.hidden" ) )
     shouldSelect._sheetIndex = 0
 
     for k, v in ipairs( MKeyboard.sheets ) do
@@ -560,10 +560,10 @@ end
 function uiHandler:SetMidiPortName( name )
     if name then
         if string.len( name ) > 28 then
-            name = string.sub( name, 1, 25 ) .. '...'
+            name = string.sub( name, 1, 25 ) .. "..."
         end
 
-        self.openPortName = string.format( langGet( 'mk.midi.connected' ), name )
+        self.openPortName = string.format( langGet( "mk.midi.connected" ), name )
     else
         self.openPortName = nil
     end
@@ -584,9 +584,9 @@ function uiHandler:ShowDevicesDialog()
         MKeyboard.midiHandler.selectedPort = nil
     end
 
-    self.frameDevices = vgui.Create( 'DFrame' )
+    self.frameDevices = vgui.Create( "DFrame" )
     self.frameDevices:SetSize( 300, 130 )
-    self.frameDevices:SetTitle( langGet( 'mk.midi.device.choose' ) )
+    self.frameDevices:SetTitle( langGet( "mk.midi.device.choose" ) )
     self.frameDevices:SetVisible( true )
     self.frameDevices:SetDraggable( true )
     self.frameDevices:ShowCloseButton( true )
@@ -602,22 +602,22 @@ function uiHandler:ShowDevicesDialog()
         oldPaint( s, sw, sh )
     end
 
-    local labelHelp = vgui.Create( 'DLabel', self.frameDevices )
+    local labelHelp = vgui.Create( "DLabel", self.frameDevices )
     labelHelp:SetPos( 10, 40 )
     labelHelp:SetSize( 280, 40 )
 
     labelHelp:SetText( string.format(
-        langGet( 'mk.midi.found' ),
+        langGet( "mk.midi.found" ),
         tostring( table.Count( midiPorts ) )
     ) )
 
-    local comboDevices = vgui.Create( 'DComboBox', self.frameDevices )
+    local comboDevices = vgui.Create( "DComboBox", self.frameDevices )
     comboDevices:SetPos( 10, 90 )
     comboDevices:SetSize( 280, 20 )
-    comboDevices:SetValue( langGet( 'mk.midi.select' ) )
+    comboDevices:SetValue( langGet( "mk.midi.select" ) )
 
     for k, v in pairs( midiPorts ) do
-        comboDevices:AddChoice( '[' .. k .. '] ' .. v )
+        comboDevices:AddChoice( "[" .. k .. "] " .. v )
     end
 
     comboDevices.OnSelect = function( _, index )
@@ -634,9 +634,9 @@ function uiHandler:ShowChannelsDialog()
 
     local tall = math.min( 610, ScrH() * 0.6 )
 
-    self.frameChannels = vgui.Create( 'DFrame' )
+    self.frameChannels = vgui.Create( "DFrame" )
     self.frameChannels:SetSize( 400, tall )
-    self.frameChannels:SetTitle( langGet( 'mk.channels' ) )
+    self.frameChannels:SetTitle( langGet( "mk.channels" ) )
     self.frameChannels:SetVisible( true )
     self.frameChannels:SetSizable( true )
     self.frameChannels:SetDraggable( true )
@@ -654,7 +654,7 @@ function uiHandler:ShowChannelsDialog()
         MKeyboard:OnButton( key, false )
     end
 
-    local scrollChannels = vgui.Create( 'DScrollPanel', self.frameChannels )
+    local scrollChannels = vgui.Create( "DScrollPanel", self.frameChannels )
     scrollChannels:Dock( FILL )
 
     local function paintChannelPanel( s, sw, sh )
@@ -684,7 +684,7 @@ function uiHandler:ShowChannelsDialog()
     for c = 0, 15 do
         self.channelState[c] = 0
 
-        local panelChannel = vgui.Create( 'DPanel', scrollChannels )
+        local panelChannel = vgui.Create( "DPanel", scrollChannels )
         panelChannel:SetSize( wide, 32 )
         panelChannel:Dock( TOP )
         panelChannel:DockMargin( 0, 0, 0, 4 )
@@ -692,18 +692,18 @@ function uiHandler:ShowChannelsDialog()
         panelChannel.channel = c
         panelChannel.Paint = paintChannelPanel
 
-        local lblIndex = vgui.Create( 'DLabel', panelChannel )
-        lblIndex:SetFont( 'Trebuchet24' )
+        local lblIndex = vgui.Create( "DLabel", panelChannel )
+        lblIndex:SetFont( "Trebuchet24" )
         lblIndex:SetTextColor( colors.white )
-        lblIndex:SetText( '#' .. ( c + 1 ) )
+        lblIndex:SetText( "#" .. ( c + 1 ) )
         lblIndex:SetWide( 50 )
         lblIndex:Dock( LEFT )
         lblIndex:DockMargin( 20, 0, 0, 0 )
 
-        local comboInstr = vgui.Create( 'DComboBox', panelChannel )
+        local comboInstr = vgui.Create( "DComboBox", panelChannel )
         comboInstr:SetSortItems( false )
-        comboInstr:AddChoice( langGet( 'mk.channels.usecurrent' ), -1, true )
-        comboInstr:AddChoice( langGet( 'mk.channels.mute' ), 0 )
+        comboInstr:AddChoice( langGet( "mk.channels.usecurrent" ), -1, true )
+        comboInstr:AddChoice( langGet( "mk.channels.mute" ), 0 )
         comboInstr:AddSpacer()
         comboInstr:Dock( FILL )
 

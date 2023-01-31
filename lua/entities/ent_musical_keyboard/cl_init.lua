@@ -1,4 +1,4 @@
-include( 'shared.lua' )
+include( "shared.lua" )
 
 local function Fit( val, valMin, valMax, outMin, outMax )
     return ( val - valMin ) * ( outMax - outMin ) / ( valMax - valMin ) + outMin

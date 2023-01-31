@@ -24,7 +24,7 @@ MKeyboard.settings = {
 
 local shortcuts = {
     [KEY_TAB] =	function()
-        RunConsoleCommand( 'keyboard_leave', MKeyboard.entity:EntIndex() )
+        RunConsoleCommand( "keyboard_leave", MKeyboard.entity:EntIndex() )
     end,
 
     [KEY_SPACE] = function()
@@ -49,9 +49,9 @@ local shortcuts = {
 }
 
 local dontBlockBinds = {
-    ['+attack'] = true,
-    ['+attack2'] = true,
-    ['+duck'] = true
+    ["+attack"] = true,
+    ["+attack2"] = true,
+    ["+duck"] = true
 }
 
 local function validateInteger( n, min, max )
@@ -59,7 +59,7 @@ local function validateInteger( n, min, max )
 end
 
 function MKeyboard:LoadSettings()
-    local rawData = file.Read( self.SETTINGS_FILE, 'DATA' )
+    local rawData = file.Read( self.SETTINGS_FILE, "DATA" )
     if rawData == nil then return end
 
     local data = util.JSONToTable( rawData ) or {}
@@ -96,7 +96,7 @@ function MKeyboard:LoadSettings()
     end
 
     -- links between instruments and MIDI channels
-    if data.channelInstruments and type( data.channelInstruments ) == 'table' then
+    if data.channelInstruments and type( data.channelInstruments ) == "table" then
         for c, i in pairs( data.channelInstruments ) do
             local channel = validateInteger( c, 0, 15 )
             local instrument = validateInteger( i, 1, instrumentCount )
@@ -133,28 +133,28 @@ function MKeyboard:Init( ent )
 
     self.uiHandler:Init()
 
-    hook.Add( 'Think', 'mkeyboard_ProcessLocalKeyboard', function()
+    hook.Add( "Think", "mkeyboard_ProcessLocalKeyboard", function()
         self:Think()
     end )
 
-    hook.Add( 'PlayerButtonDown', 'mkeyboard_LocalButtonPress', function( ply, button )
+    hook.Add( "PlayerButtonDown", "mkeyboard_LocalButtonPress", function( ply, button )
         if ply == LocalPlayer() and IsFirstTimePredicted() then
             self:OnButton( button, true )
         end
     end )
 
-    hook.Add( 'PlayerButtonUp', 'mkeyboard_LocalButtonRelease', function( ply, button )
+    hook.Add( "PlayerButtonUp", "mkeyboard_LocalButtonRelease", function( ply, button )
         if ply == LocalPlayer() and IsFirstTimePredicted() then
             self:OnButton( button, false )
         end
     end )
 
-    hook.Add( 'PlayerBindPress', 'mkeyboard_BlockBinds', function( _, bind )
+    hook.Add( "PlayerBindPress", "mkeyboard_BlockBinds", function( _, bind )
         if not dontBlockBinds[bind] then return true end
     end )
 
     -- Custom Chat compatibility
-    hook.Add( 'BlockChatInput', 'mkeyboard_PreventOpeningChat', function()
+    hook.Add( "BlockChatInput", "mkeyboard_PreventOpeningChat", function()
         return true
     end )
 end
@@ -171,11 +171,11 @@ function MKeyboard:Shutdown()
     self.midiHandler:Close()
     self.uiHandler:Shutdown()
 
-    hook.Remove( 'Think', 'mkeyboard_ProcessLocalKeyboard' )
-    hook.Remove( 'PlayerButtonDown', 'mkeyboard_LocalButtonPress' )
-    hook.Remove( 'PlayerButtonUp', 'mkeyboard_LocalButtonRelease' )
-    hook.Remove( 'PlayerBindPress', 'mkeyboard_BlockBinds' )
-    hook.Remove( 'BlockChatInput', 'mkeyboard_PreventOpeningChat' )
+    hook.Remove( "Think", "mkeyboard_ProcessLocalKeyboard" )
+    hook.Remove( "PlayerButtonDown", "mkeyboard_LocalButtonPress" )
+    hook.Remove( "PlayerButtonUp", "mkeyboard_LocalButtonRelease" )
+    hook.Remove( "PlayerBindPress", "mkeyboard_BlockBinds" )
+    hook.Remove( "BlockChatInput", "mkeyboard_PreventOpeningChat" )
 end
 
 function MKeyboard:NoteOn( note, velocity, isMidi, midiChannel )
@@ -193,7 +193,7 @@ function MKeyboard:NoteOn( note, velocity, isMidi, midiChannel )
 
     self.entity:EmitNote( note, velocity, 80, instrument, isMidi )
 
-    self.noteStates[note] = isMidi and 'midi' or 'on'
+    self.noteStates[note] = isMidi and "midi" or "on"
     self.lastNoteWasAutomated = isMidi
 
     -- remember when we started putting notes
@@ -238,7 +238,7 @@ function MKeyboard:ReproduceQueue()
 end
 
 function MKeyboard:TransmitQueue()
-    net.Start( 'mkeyboard.notes', false )
+    net.Start( "mkeyboard.notes", false )
     net.WriteEntity( self.entity )
     net.WriteBool( self.lastNoteWasAutomated )
     net.WriteUInt( #self.transmitQueue, 5 )
@@ -322,11 +322,11 @@ function MKeyboard:OnButton( button, isPressed )
     end
 end
 
-hook.Add( 'Think', 'mkeyboard_ProcessReproductionQueue', function()
+hook.Add( "Think", "mkeyboard_ProcessReproductionQueue", function()
     MKeyboard:ReproduceQueue()
 end )
 
-net.Receive( 'mkeyboard.set_entity', function()
+net.Receive( "mkeyboard.set_entity", function()
     local ent = net.ReadEntity()
 
     MKeyboard:Shutdown()
@@ -336,7 +336,7 @@ net.Receive( 'mkeyboard.set_entity', function()
     end
 end )
 
-net.Receive( 'mkeyboard.notes', function()
+net.Receive( "mkeyboard.notes", function()
     local ent = net.ReadEntity()
     if not IsValid( ent ) or not ent.EmitNote then return end
 
@@ -360,7 +360,7 @@ end )
 
 -- key press/release net event that only runs on single-player
 if game.SinglePlayer() then
-    net.Receive( 'mkeyboard.key', function()
+    net.Receive( "mkeyboard.key", function()
         local button = net.ReadUInt( 8 )
         local pressed = net.ReadBool()
 

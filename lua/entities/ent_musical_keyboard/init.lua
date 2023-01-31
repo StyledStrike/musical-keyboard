@@ -1,6 +1,6 @@
-AddCSLuaFile( 'cl_init.lua' )
-AddCSLuaFile( 'shared.lua' )
-include( 'shared.lua' )
+AddCSLuaFile( "cl_init.lua" )
+AddCSLuaFile( "shared.lua" )
+include( "shared.lua" )
 
 function ENT:SpawnFunction( ply, tr )
     if not tr.Hit then return end
@@ -15,7 +15,7 @@ function ENT:SpawnFunction( ply, tr )
 end
 
 function ENT:Initialize()
-    self:SetModel( 'models/styledstrike/musical_keyboard.mdl' )
+    self:SetModel( "models/styledstrike/musical_keyboard.mdl" )
     self:PhysicsInit( SOLID_VPHYSICS )
     self:SetMoveType( MOVETYPE_VPHYSICS )
     self:SetSolid( SOLID_VPHYSICS )
@@ -32,7 +32,7 @@ end
 
 function ENT:SetPlayer( ply )
     if not IsValid( self.Ply ) then
-        net.Start( 'mkeyboard.set_entity', false )
+        net.Start( "mkeyboard.set_entity", false )
         net.WriteEntity( self )
         net.Send( ply )
 
@@ -42,7 +42,7 @@ end
 
 function ENT:RemovePlayer()
     if IsValid( self.Ply ) then
-        net.Start( 'mkeyboard.set_entity', false )
+        net.Start( "mkeyboard.set_entity", false )
         net.WriteEntity( nil )
         net.Send( self.Ply )
 

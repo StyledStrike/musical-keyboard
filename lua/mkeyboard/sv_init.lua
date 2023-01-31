@@ -1,10 +1,10 @@
-resource.AddWorkshop( '2656563609' )
+resource.AddWorkshop( "2656563609" )
 
-util.AddNetworkString( 'mkeyboard.set_entity' )
-util.AddNetworkString( 'mkeyboard.notes' )
+util.AddNetworkString( "mkeyboard.set_entity" )
+util.AddNetworkString( "mkeyboard.notes" )
 
 local function FindBroadcastTargets( pos, radius, filter )
-    -- make the radius squared since we're using DistToSqr (faster) 
+    -- make the radius squared since we"re using DistToSqr (faster) 
     radius = radius * radius
 
     local found = {}
@@ -19,7 +19,7 @@ local function FindBroadcastTargets( pos, radius, filter )
 end
 
 function MKeyboard:IsAMusicalKeyboard( ent )
-    return IsValid( ent ) and ent:GetClass() == 'ent_musical_keyboard'
+    return IsValid( ent ) and ent:GetClass() == "ent_musical_keyboard"
 end
 
 function MKeyboard:BroadcastNotes( notes, ent, automated, ignoreTarget )
@@ -29,7 +29,7 @@ function MKeyboard:BroadcastNotes( notes, ent, automated, ignoreTarget )
     local targets = FindBroadcastTargets( ent:GetPos(), self.NET_BROADCAST_DISTANCE, ignoreTarget )
     if #targets == 0 then return end
 
-    net.Start( 'mkeyboard.notes', false )
+    net.Start( "mkeyboard.notes", false )
     net.WriteEntity( ent )
     net.WriteBool( automated )
     net.WriteUInt( #notes, 5 )
@@ -44,7 +44,7 @@ function MKeyboard:BroadcastNotes( notes, ent, automated, ignoreTarget )
     net.Send( targets )
 end
 
-concommand.Add( 'keyboard_leave', function( ply, _, args )
+concommand.Add( "keyboard_leave", function( ply, _, args )
     if #args < 1 then return end
     local ent = ents.GetByIndex( args[1] )
 
@@ -53,7 +53,7 @@ concommand.Add( 'keyboard_leave', function( ply, _, args )
     end
 end )
 
-net.Receive( 'mkeyboard.notes', function( _, ply )
+net.Receive( "mkeyboard.notes", function( _, ply )
     local ent = net.ReadEntity()
 
     -- make sure the client didnt send the wrong entity
@@ -87,17 +87,17 @@ end )
 -- hooks that only run serverside on single-player
 -- TODO: is there a better way to detect these hooks client-side?
 if game.SinglePlayer() then
-    util.AddNetworkString( 'mkeyboard.key' )
+    util.AddNetworkString( "mkeyboard.key" )
 
-    hook.Add( 'PlayerButtonDown', 'mkeyboard_ButtonDownWorkaround', function( ply, button )
-        net.Start( 'mkeyboard.key', true )
+    hook.Add( "PlayerButtonDown", "mkeyboard_ButtonDownWorkaround", function( ply, button )
+        net.Start( "mkeyboard.key", true )
         net.WriteUInt( button, 8 )
         net.WriteBool( true )
         net.Send( ply )
     end )
 
-    hook.Add( 'PlayerButtonUp', 'mkeyboard_ButtonUpWorkaround', function( ply, button )
-        net.Start( 'mkeyboard.key', true )
+    hook.Add( "PlayerButtonUp", "mkeyboard_ButtonUpWorkaround", function( ply, button )
+        net.Start( "mkeyboard.key", true )
         net.WriteUInt( button, 8 )
         net.WriteBool( false )
         net.Send( ply )
