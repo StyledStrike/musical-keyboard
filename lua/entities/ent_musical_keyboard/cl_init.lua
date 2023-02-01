@@ -1,8 +1,7 @@
 include( "shared.lua" )
 
-local function Fit( val, valMin, valMax, outMin, outMax )
-    return ( val - valMin ) * ( outMax - outMin ) / ( valMax - valMin ) + outMin
-end
+local RealTime = RealTime
+local Vector = Vector
 
 local blackKeys = {
     [1] = true, [3] = true, [6] = true, [8] = true, [10] = true
@@ -21,6 +20,10 @@ local offsetKeys = {
     [9] = 0.4,
     [11] = 0.6
 }
+
+local function Fit( val, valMin, valMax, outMin, outMax )
+    return ( val - valMin ) * ( outMax - outMin ) / ( valMax - valMin ) + outMin
+end
 
 function ENT:Initialize()
     self.drawNotes = {}
@@ -56,7 +59,7 @@ function ENT:EmitNote( note, velocity, level, instrument, automated )
         t = RealTime() + 0.2,
         min = Vector( x, -1.5, -1 ),
         max = Vector( x + width, len, height ),
-        colorIdx = automated and 2 or 1
+        colorIndex = automated and 2 or 1
     }
 end
 
@@ -72,7 +75,7 @@ function ENT:Draw()
         if t > p.t then
             self.drawNotes[note] = nil
         else
-            local clr = keyColors[p.colorIdx]
+            local clr = keyColors[p.colorIndex]
             local alpha = 255 * ( ( p.t - t ) / 0.2 )
 
             render.DrawBox(

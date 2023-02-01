@@ -1,3 +1,15 @@
+surface.CreateFont( "MKeyboard_Title", {
+    size = ScrH() * 0.025, weight = 300, antialias = true, font = "Coolvetica"
+} )
+
+surface.CreateFont( "MKeyboard_Key", {
+    size = ScrH() * 0.02, weight = 300, antialias = true, font = "Coolvetica"
+} )
+
+surface.CreateFont( "MKeyboard_Sheet", {
+    size = ScrH() * 0.022, antialias = true, font = "Roboto"
+} )
+
 MKeyboard.entity = nil
 
 MKeyboard.reproduceQueue = {}
@@ -5,48 +17,129 @@ MKeyboard.transmitQueue = {}
 MKeyboard.queueTimer = nil
 MKeyboard.queueStart = 0
 
-MKeyboard.shiftMode = false
-MKeyboard.noteStates = {}
-MKeyboard.blockInput = 0
+MKeyboard.colors = {
+    black = Color( 0, 0, 0, 255 ),
+    white = Color( 255, 255, 255, 255 ),
+    bg = Color( 0, 0, 0, 240 ),
 
--- settings & persistence
-MKeyboard.settings = {
-    layout = 1,
-    instrument = 1,
-    sheet = 0,
-    velocity = 127,
-    octave = 0,
-    midiTranspose = 0,
-
-    channelInstruments = {},
-    drawKeyLabels = true
+    disabled = Color( 120, 120, 120, 255 ),
+    manual = Color( 245, 163, 108 ),
+    midi = Color( 196, 0, 226 )
 }
 
-local shortcuts = {
+MKeyboard.shortcuts = {
     [KEY_TAB] =	function()
         RunConsoleCommand( "keyboard_leave", MKeyboard.entity:EntIndex() )
     end,
 
     [KEY_SPACE] = function()
-        MKeyboard.uiHandler:ToggleExpandedBar()
+        MKeyboard:ToggleMenu()
     end,
 
     [KEY_LEFT] = function()
-        MKeyboard.uiHandler:ChangeInstrument( -1 )
+        MKeyboard:ChangeInstrument( -1 )
     end,
 
     [KEY_RIGHT] = function()
-        MKeyboard.uiHandler:ChangeInstrument( 1 )
+        MKeyboard:ChangeInstrument( 1 )
     end,
 
     [KEY_UP] = function()
-        MKeyboard.uiHandler:AddOctave( 1 )
+        MKeyboard:AddOctave( 1 )
     end,
 
     [KEY_DOWN] = function()
-        MKeyboard.uiHandler:AddOctave( -1 )
+        MKeyboard:AddOctave( -1 )
     end
 }
+
+do
+    -- settings & persistence
+    MKeyboard.settings = {
+        layout = 1,
+        instrument = 1,
+        sheet = 0,
+        velocity = 127,
+        octave = 0,
+        midiTranspose = 0,
+
+        channelInstruments = {},
+        drawKeyLabels = true
+    }
+
+    local function validateInteger( n, min, max )
+        return math.Round( math.Clamp( tonumber( n ), min, max ) )
+    end
+
+    function MKeyboard:LoadSettings()
+        local rawData = file.Read( self.SETTINGS_FILE, "DATA" )
+        if not rawData then return end
+
+        local data = util.JSONToTable( rawData ) or {}
+        local instrumentCount = #self.instruments
+
+        -- last layout that was used on the keyboard
+        if data.layout then
+            self.settings.layout = validateInteger( data.layout, 1, #self.layouts )
+        end
+
+        -- last instrument that was used on the keyboard
+        if data.instrument then
+            self.settings.instrument = validateInteger( data.instrument, 1, instrumentCount )
+        end
+
+        -- last selected sheet
+        if data.sheet then
+            self.settings.sheet = validateInteger( data.sheet, 0, #self.sheets )
+        end
+
+        -- last velocity set by the settings
+        if data.velocity then
+            self.settings.velocity = validateInteger( data.velocity, 1, 127 )
+        end
+
+        -- last octave that was used on the keyboard
+        if data.octave then
+            self.settings.octave = validateInteger( data.octave, -3, 3 )
+        end
+
+        -- last transpose that was used with midi
+        if data.midiTranspose then
+            self.settings.midiTranspose = validateInteger( data.midiTranspose, -48, 48 )
+        end
+
+        -- links between instruments and MIDI channels
+        if data.channelInstruments and type( data.channelInstruments ) == "table" then
+            for c, i in pairs( data.channelInstruments ) do
+                local channel = validateInteger( c, 0, 15 )
+                local instrument = validateInteger( i, 1, instrumentCount )
+
+                self.settings.channelInstruments[channel] = instrument
+            end
+        end
+
+        -- draw labels for keys
+        self.settings.drawKeyLabels = Either( isbool( data.drawKeyLabels ), tobool( data.drawKeyLabels ), true )
+    end
+
+    function MKeyboard:SaveSettings()
+        local s = self.settings
+
+        file.Write(
+            self.SETTINGS_FILE,
+            util.TableToJSON( {
+                layout				= s.layout,
+                instrument			= s.instrument,
+                sheet				= s.sheet,
+                velocity			= s.velocity,
+                octave				= s.octave,
+                midiTranspose		= s.midiTranspose,
+                channelInstruments	= s.channelInstruments,
+                drawKeyLabels		= s.drawKeyLabels
+            }, true )
+        )
+    end
+end
 
 local dontBlockBinds = {
     ["+attack"] = true,
@@ -54,107 +147,49 @@ local dontBlockBinds = {
     ["+duck"] = true
 }
 
-local function validateInteger( n, min, max )
-    return math.Round( math.Clamp( tonumber( n ), min, max ) )
-end
-
-function MKeyboard:LoadSettings()
-    local rawData = file.Read( self.SETTINGS_FILE, "DATA" )
-    if rawData == nil then return end
-
-    local data = util.JSONToTable( rawData ) or {}
-    local instrumentCount = #self.instruments
-
-    -- last layout that was used on the keyboard
-    if data.layout then
-        self.settings.layout = validateInteger( data.layout, 1, #self.layouts )
-    end
-
-    -- last instrument that was used on the keyboard
-    if data.instrument then
-        self.settings.instrument = validateInteger( data.instrument, 1, instrumentCount )
-    end
-
-    -- last selected sheet
-    if data.sheet then
-        self.settings.sheet = validateInteger( data.sheet, 0, #self.sheets )
-    end
-
-    -- last velocity set by the settings
-    if data.velocity then
-        self.settings.velocity = validateInteger( data.velocity, 1, 127 )
-    end
-
-    -- last octave that was used on the keyboard
-    if data.octave then
-        self.settings.octave = validateInteger( data.octave, -3, 3 )
-    end
-
-    -- last transpose that was used with midi
-    if data.midiTranspose then
-        self.settings.midiTranspose = validateInteger( data.midiTranspose, -48, 48 )
-    end
-
-    -- links between instruments and MIDI channels
-    if data.channelInstruments and type( data.channelInstruments ) == "table" then
-        for c, i in pairs( data.channelInstruments ) do
-            local channel = validateInteger( c, 0, 15 )
-            local instrument = validateInteger( i, 1, instrumentCount )
-
-            self.settings.channelInstruments[channel] = instrument
-        end
-    end
-
-    -- draw labels for keys
-    self.settings.drawKeyLabels = Either( isbool( data.drawKeyLabels ), tobool( data.drawKeyLabels ), true )
-end
-
-function MKeyboard:SaveSettings()
-    local s = self.settings
-
-    file.Write(
-        self.SETTINGS_FILE,
-        util.TableToJSON( {
-            layout				= s.layout,
-            instrument			= s.instrument,
-            sheet				= s.sheet,
-            velocity			= s.velocity,
-            octave				= s.octave,
-            midiTranspose		= s.midiTranspose,
-            channelInstruments	= s.channelInstruments,
-            drawKeyLabels		= s.drawKeyLabels
-        }, true )
-    )
-end
-
 function MKeyboard:Init( ent )
     self.entity = ent
-    self.blockInput = RealTime() + 0.3
+    self.blockInputTimer = RealTime() + 0.3
 
-    self.uiHandler:Init()
+    self:CreateInterface()
 
-    hook.Add( "Think", "mkeyboard_ProcessLocalKeyboard", function()
-        self:Think()
-    end )
+    hook.Add( "Think", "MKeyboard.ProcessLocalKeyboard", function()
+        if not IsValid( self.entity ) then
+            self:Shutdown()
 
-    hook.Add( "PlayerButtonDown", "mkeyboard_LocalButtonPress", function( ply, button )
-        if ply == LocalPlayer() and IsFirstTimePredicted() then
-            self:OnButton( button, true )
+            return
+        end
+
+        if self.isMidiAvailable then
+            self:CheckMidiPorts()
+        end
+
+        local t = SysTime()
+
+        -- if the queued notes are ready to be sent...
+        if self.queueTimer and t > self.queueTimer then
+            self:TransmitQueue()
         end
     end )
 
-    hook.Add( "PlayerButtonUp", "mkeyboard_LocalButtonRelease", function( ply, button )
+    hook.Add( "PlayerButtonDown", "MKeyboard.DetectButtonPress", function( ply, button )
         if ply == LocalPlayer() and IsFirstTimePredicted() then
-            self:OnButton( button, false )
+            self:ButtonPress( button )
         end
     end )
 
-    hook.Add( "PlayerBindPress", "mkeyboard_BlockBinds", function( _, bind )
+    hook.Add( "PlayerButtonUp", "MKeyboard.DetectButtonRelease", function( ply, button )
+        if ply == LocalPlayer() and IsFirstTimePredicted() then
+            self:ButtonRelease( button )
+        end
+    end )
+
+    hook.Add( "PlayerBindPress", "MKeyboard.BlockBinds", function( _, bind )
         if not dontBlockBinds[bind] then return true end
     end )
 
     -- Custom Chat compatibility
-    hook.Add( "BlockChatInput", "mkeyboard_PreventOpeningChat", function()
+    hook.Add( "BlockChatInput", "MKeyboard.PreventOpeningChat", function()
         return true
     end )
 end
@@ -168,32 +203,27 @@ function MKeyboard:Shutdown()
     self.shiftMode = false
     self.noteStates = {}
 
-    self.midiHandler:Close()
-    self.uiHandler:Shutdown()
+    self:CloseInterface()
 
-    hook.Remove( "Think", "mkeyboard_ProcessLocalKeyboard" )
-    hook.Remove( "PlayerButtonDown", "mkeyboard_LocalButtonPress" )
-    hook.Remove( "PlayerButtonUp", "mkeyboard_LocalButtonRelease" )
-    hook.Remove( "PlayerBindPress", "mkeyboard_BlockBinds" )
-    hook.Remove( "BlockChatInput", "mkeyboard_PreventOpeningChat" )
+    if self.isMidiAvailable then
+        self:MidiClose()
+    end
+
+    hook.Remove( "Think", "MKeyboard.ProcessLocalKeyboard" )
+    hook.Remove( "PlayerButtonDown", "MKeyboard.DetectButtonPress" )
+    hook.Remove( "PlayerButtonUp", "MKeyboard.DetectButtonRelease" )
+    hook.Remove( "PlayerBindPress", "MKeyboard.BlockBinds" )
+    hook.Remove( "BlockChatInput", "MKeyboard.PreventOpeningChat" )
 end
 
-function MKeyboard:NoteOn( note, velocity, isMidi, midiChannel )
-    local instrument = self.settings.instrument
-
-    if midiChannel then
-        self.uiHandler.channelState[midiChannel] = 1
-        instrument = self.settings.channelInstruments[midiChannel] or instrument
-
-        if instrument == 0 then return end
-    end
+function MKeyboard:OnNoteOn( note, velocity, instrument, isMidi )
+    velocity = velocity or self.settings.velocity
+    instrument = instrument or self.settings.instrument
 
     local instr = self.instruments[instrument]
     if note < instr.firstNote or note > instr.lastNote then return end
 
     self.entity:EmitNote( note, velocity, 80, instrument, isMidi )
-
-    self.noteStates[note] = isMidi and "midi" or "on"
     self.lastNoteWasAutomated = isMidi
 
     -- remember when we started putting notes
@@ -208,32 +238,9 @@ function MKeyboard:NoteOn( note, velocity, isMidi, midiChannel )
     -- add notes to the queue unless the limit is was reached
     local noteCount = #self.transmitQueue
     if noteCount < self.NET_MAX_NOTES then
-        self.transmitQueue[noteCount + 1] = { note, velocity, instrument, t - self.queueStart }
-    end
-end
-
-function MKeyboard:NoteOff( note )
-    self.noteStates[note] = nil
-end
-
-function MKeyboard:NoteOffAll()
-    for k, _ in pairs( self.noteStates ) do
-        self.noteStates[k] = nil
-    end
-end
-
-function MKeyboard:ReproduceQueue()
-    local t = SysTime()
-
-    -- play the networked notes, keeping the original timings
-    for time, data in pairs( self.reproduceQueue ) do
-        if t > time then
-            if IsValid( data[1] ) then
-                data[1]:EmitNote( data[2], data[3], 80, data[4], data[5] )
-            end
-
-            self.reproduceQueue[time] = nil
-        end
+        self.transmitQueue[noteCount + 1] = {
+            note, velocity, instrument, t - self.queueStart
+        }
     end
 end
 
@@ -256,74 +263,25 @@ function MKeyboard:TransmitQueue()
     self.queueTimer = nil
 end
 
-function MKeyboard:Think()
-    if not IsValid( self.entity ) then
-        self:Shutdown()
+local SysTime = SysTime
 
-        return
-    end
+hook.Add( "Think", "MKeyboard.ProcessReproductionQueue", function()
+    local now = SysTime()
+    local queue = MKeyboard.reproduceQueue
+    local timestamps = table.GetKeys( queue )
 
-    self.midiHandler:Think()
+    -- play the networked notes, keeping the original timings
+    for _, t in ipairs( timestamps ) do
+        if now > t then
+            local n = queue[t]
 
-    local t = SysTime()
-
-    -- if the queued notes are ready to be sent...
-    if self.queueTimer and t > self.queueTimer then
-        self:TransmitQueue()
-    end
-end
-
-function MKeyboard:OnButton( button, isPressed )
-    if button == KEY_LSHIFT then
-        self.shiftMode = isPressed
-    end
-
-    -- process shortcuts
-    if shortcuts[button] and not isPressed then
-        shortcuts[button]()
-        return
-    end
-
-    if self.blockInput > RealTime() then return end
-
-    local layoutKeys = self.layouts[self.settings.layout].keys
-
-    -- process layout keys
-    for _, params in ipairs( layoutKeys ) do
-        --[[ params:
-            key [1],
-            note [2],
-            type [3],
-            label [4],
-            require SHIFT [5],
-            alternative key [6]
-        ]]
-
-        -- if either the "main" or "alternative" buttons are pressed for this key...
-        if params[1] == button or ( params[6] and params[6] == button ) then
-            local note = params[2] + self.settings.octave * 12
-
-            if isPressed then
-                -- if this key requires shift and shift is pressed...
-                if params[5] and self.shiftMode then
-                    self:NoteOn( note, self.settings.velocity, false )
-                    break
-                end
-
-                -- if this key does NOT require shift and shift is NOT pressed...
-                if not params[5] and not self.shiftMode then
-                    self:NoteOn( note, self.settings.velocity, false )
-                    break
-                end
-            else
-                self:NoteOff( note )
+            if IsValid( n[1] ) then
+                n[1]:EmitNote( n[2], n[3], 80, n[4], n[5] )
             end
+
+            queue[t] = nil
         end
     end
-end
-
-hook.Add( "Think", "mkeyboard_ProcessReproductionQueue", function()
-    MKeyboard:ReproduceQueue()
 end )
 
 net.Receive( "mkeyboard.set_entity", function()
@@ -344,28 +302,32 @@ net.Receive( "mkeyboard.notes", function()
     local noteCount = net.ReadUInt( 5 )
     local note, vel, instr, timeOffset
 
+    local queue = MKeyboard.reproduceQueue
     local t = SysTime()
-    local i = 1
 
-    while i < noteCount do
+    for i = 1, noteCount do
         note = net.ReadUInt( 7 )
         vel = net.ReadUInt( 7 )
         instr = net.ReadUInt( 6 )
         timeOffset = net.ReadFloat()
 
-        MKeyboard.reproduceQueue[t + timeOffset] = { ent, note, vel, instr, automated }
-        i = i + 1
+        -- "i * 0.01" exists just to prevent overriding stuff already on the queue
+        queue[t + timeOffset + ( i * 0.01 )] = { ent, note, vel, instr, automated }
     end
 end )
 
--- key press/release net event that only runs on single-player
+-- Workaround net events for hooks that only run serverside on single-player
 if game.SinglePlayer() then
     net.Receive( "mkeyboard.key", function()
         local button = net.ReadUInt( 8 )
         local pressed = net.ReadBool()
 
         if IsValid( MKeyboard.entity ) then
-            MKeyboard:OnButton( button, pressed )
+            if pressed then
+                MKeyboard:ButtonPress( button )
+            else
+                MKeyboard:ButtonRelease( button )
+            end
         end
     end )
 end
