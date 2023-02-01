@@ -1,3 +1,6 @@
+-- TODO: When available next update,
+-- use util.IsBinaryModuleInstalled
+
 -- based on Starfall"s SF.Require, for clientside use
 local function SafeRequireModule( moduleName )
     local osSuffix
@@ -29,15 +32,16 @@ end
 -- safely require the midi module
 SafeRequireModule( "midi" )
 
-local midiHandler = {
-    selectedPort = nil,
-    portTimer = 0
-}
+if not midi then return end
 
-MKeyboard.midiHandler = midiHandler
+MKeyboard.isMidiAvailable = true
+MKeyboard.selectedMidiPort = nil
+MKeyboard.channelState = {}
 
-function midiHandler:Open( port )
-    self:Close()
+function MKeyboard:MidiOpen( port )
+    if midi.IsOpened() then
+        self:MidiClose()
+    end
 
     local portName = midi.GetPorts()[port]
     if not portName then
@@ -50,14 +54,14 @@ function midiHandler:Open( port )
 
     local success, err = pcall( midi.Open, port )
     if success then
-        MKeyboard.uiHandler:SetMidiPortName( portName )
+        self:SetMidiPortName( portName )
     else
         print( "Failed to open MIDI port: " .. err )
     end
 end
 
-function midiHandler:Close()
-    MKeyboard.uiHandler:SetMidiPortName( nil )
+function MKeyboard:MidiClose()
+    self:SetMidiPortName( nil )
 
     if midi and midi.IsOpened() then
         print( "Closing MIDI port." )
@@ -65,27 +69,45 @@ function midiHandler:Close()
     end
 end
 
-function midiHandler:Think()
+local portTimer = 0
+
+function MKeyboard:CheckMidiPorts()
     -- Try to open the selected midi port
-    if self.selectedPort and not midi.IsOpened() and RealTime() > self.portTimer then
-        self.portTimer = RealTime() + 5
-        self:Open( self.selectedPort )
+    if self.selectedMidiPort and not midi.IsOpened() and RealTime() > portTimer then
+        portTimer = RealTime() + 5
+        self:MidiOpen( self.selectedMidiPort )
     end
 end
 
--- listen to events from the MIDI module
-hook.Add( "MIDI", "mkeyboard_CaptureMIDIEvents", function( _, code, p1, p2 )
+function MKeyboard:SetMidiPortName( name )
+    if name then
+        if string.len( name ) > 28 then
+            name = string.sub( name, 1, 25 ) .. "..."
+        end
+
+        self.midiPortName = string.format( language.GetPhrase( "mk.midi.connected" ), name )
+    else
+        self.midiPortName = nil
+    end
+end
+
+local settings = MKeyboard.settings
+
+hook.Add( "MIDI", "MKeyboard.CaptureMIDIEvents", function( _, code, p1, p2 )
     if not IsValid( MKeyboard.entity ) then return end
     if not code then return end
 
     local midiCmd = midi.GetCommandName( code )
-    local transpose = MKeyboard.settings.midiTranspose
+    local transpose = settings.midiTranspose
 
     if midiCmd == "NOTE_ON" and p2 > 0 then
         local midiChannel = midi.GetCommandChannel( code )
-        MKeyboard:NoteOn( p1 + transpose, p2, true, midiChannel )
+        local instrument = settings.channelInstruments[midiChannel]
+
+        MKeyboard:PressNote( p1 + transpose, p2, instrument, true )
+        MKeyboard.channelState[midiChannel] = 1
 
     elseif midiCmd == "NOTE_OFF" then
-        MKeyboard:NoteOff( p1 + transpose )
+        MKeyboard:ReleaseNote( p1 + transpose )
     end
 end )
