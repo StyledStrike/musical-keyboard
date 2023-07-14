@@ -2,16 +2,32 @@ AddCSLuaFile( "cl_init.lua" )
 AddCSLuaFile( "shared.lua" )
 include( "shared.lua" )
 
-function ENT:SpawnFunction( ply, tr )
-    if not tr.Hit then return end
+local function MakeKeyboardSpawner( ply, data )
+    if IsValid( ply ) and not ply:CheckLimit( "musical_keyboards" ) then return end
 
-    local ent = ents.Create( self.ClassName )
-    ent:SetPos( tr.HitPos )
-    ent:SetAngles( Angle( 0, ply:EyeAngles().y + 90, 0 ) )
+    local ent = ents.Create( data.Class )
+    if not IsValid( ent ) then return end
+
+    ent:SetPos( data.Pos )
+    ent:SetAngles( data.Angle )
     ent:Spawn()
     ent:Activate()
 
+    ply:AddCount( "musical_keyboards", ent )
+
     return ent
+end
+
+duplicator.RegisterEntityClass( "ent_musical_keyboard", MakeKeyboardSpawner, "Data" )
+
+function ENT:SpawnFunction( ply, tr )
+    if tr.Hit then
+        return MakeKeyboardSpawner( ply, {
+            Pos = tr.HitPos,
+            Angle = Angle( 0, ply:EyeAngles().y + 90, 0 ),
+            Class = self.ClassName
+        } )
+    end
 end
 
 function ENT:Initialize()

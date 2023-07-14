@@ -3,6 +3,14 @@ resource.AddWorkshop( "2656563609" )
 util.AddNetworkString( "mkeyboard.set_entity" )
 util.AddNetworkString( "mkeyboard.notes" )
 
+CreateConVar(
+    "sbox_maxmusical_keyboards",
+    "3",
+    bit.bor( FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED ),
+    "Maximum musical keyboards a player can create",
+    0
+)
+
 local function FindBroadcastTargets( pos, radius, ignore )
     -- make the radius squared, to compare with DistToSqr (faster) 
     radius = radius * radius
