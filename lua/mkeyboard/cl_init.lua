@@ -220,7 +220,7 @@ function MKeyboard:OnNoteOn( note, velocity, instrument, isMidi )
     velocity = velocity or self.settings.velocity
     instrument = instrument or self.settings.instrument
 
-    local instr = self.instruments[instrument]
+    local instr = self.instruments[instrument] or self.instruments[1]
     if note < instr.firstNote or note > instr.lastNote then return end
 
     self.entity:EmitNote( note, velocity, 80, instrument, isMidi )
