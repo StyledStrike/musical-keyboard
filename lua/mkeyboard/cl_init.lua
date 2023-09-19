@@ -189,7 +189,7 @@ function MKeyboard:Init( ent )
     end )
 
     -- Custom Chat compatibility
-    hook.Add( "BlockChatInput", "MKeyboard.PreventOpeningChat", function()
+    hook.Add( "CustomChatBlockInput", "MKeyboard.PreventOpeningChat", function()
         return true
     end )
 end
