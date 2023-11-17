@@ -13,27 +13,11 @@ MKeyboard = {
 }
 
 if SERVER then
-    include( "mkeyboard/sv_init.lua" )
+    include( "mkeyboard/server/init.lua" )
 
-    AddCSLuaFile( "mkeyboard/data/instruments.lua" )
-    AddCSLuaFile( "mkeyboard/data/layouts.lua" )
-    AddCSLuaFile( "mkeyboard/data/sheets.lua" )
-
-    AddCSLuaFile( "mkeyboard/cl_init.lua" )
-    AddCSLuaFile( "mkeyboard/cl_keyboard.lua" )
-    AddCSLuaFile( "mkeyboard/cl_midi.lua" )
-    AddCSLuaFile( "mkeyboard/cl_ui.lua" )
+    AddCSLuaFile( "mkeyboard/client/init.lua" )
 end
 
 if CLIENT then
-    include( "mkeyboard/data/instruments.lua" )
-    include( "mkeyboard/data/layouts.lua" )
-    include( "mkeyboard/data/sheets.lua" )
-
-    include( "mkeyboard/cl_init.lua" )
-    include( "mkeyboard/cl_keyboard.lua" )
-    include( "mkeyboard/cl_midi.lua" )
-    include( "mkeyboard/cl_ui.lua" )
-
-    MKeyboard:LoadSettings()
+    include( "mkeyboard/client/init.lua" )
 end

@@ -21,9 +21,7 @@ local offsetKeys = {
     [11] = 0.6
 }
 
-local function Fit( val, valMin, valMax, outMin, outMax )
-    return ( val - valMin ) * ( outMax - outMin ) / ( valMax - valMin ) + outMin
-end
+local Remap = math.Remap
 
 function ENT:Initialize()
     self.drawNotes = {}
@@ -55,7 +53,7 @@ function ENT:EmitNote( note, velocity, level, instrument, automated )
     end
 
     self.drawNotes[note] = {
-        x = Fit( note, 21, 108, -37, 36.7 ),
+        x = Remap( note, 21, 108, -37, 36.7 ),
         t = RealTime() + 0.2,
         min = Vector( x, -1.5, -1 ),
         max = Vector( x + width, len, height ),
