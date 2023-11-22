@@ -26,9 +26,10 @@ function MKeyboard:RegisterSheet( title, layoutId, sequence )
 
     local layoutSheets = self.sheets[layoutId]
 
-    layoutSheets[layoutSheets + 1] = {
+    layoutSheets[#layoutSheets + 1] = {
         title = title,
         sequence = sequence
     }
 end
+
 

@@ -48,7 +48,7 @@ end
 
 function ENT:SetPlayer( ply )
     if not IsValid( self.Ply ) then
-        net.Start( "mkeyboard.set_entity", false )
+        net.Start( "mkeyboard.set_current_keyboard", false )
         net.WriteEntity( self )
         net.Send( ply )
 
@@ -58,7 +58,7 @@ end
 
 function ENT:RemovePlayer()
     if IsValid( self.Ply ) then
-        net.Start( "mkeyboard.set_entity", false )
+        net.Start( "mkeyboard.set_current_keyboard", false )
         net.WriteEntity( nil )
         net.Send( self.Ply )
 
