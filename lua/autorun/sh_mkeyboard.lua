@@ -21,3 +21,21 @@ end
 if CLIENT then
     include( "mkeyboard/client/init.lua" )
 end
+
+-- Find and include data files
+do
+    local dataDir = "mkeyboard/data/"
+    local files = file.Find( dataDir .. "*.lua", "LUA" )
+
+    if SERVER then
+        for _, name in ipairs( files ) do
+            AddCSLuaFile( dataDir .. name )
+        end
+    end
+
+    if CLIENT then
+        for _, name in ipairs( files ) do
+            include( dataDir .. name )
+        end
+    end
+end
