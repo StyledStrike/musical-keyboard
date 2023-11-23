@@ -51,7 +51,14 @@ function MKeyboard:CloseMIDI()
 end
 
 function MKeyboard:CheckMIDI()
-    if self.selectedMIDIPort and not midi.IsOpened() then
+    if midi.IsOpened() then
+        if self.selectedMIDIPort and not midi.GetPorts()[self.selectedMIDIPort] then
+            print( "MIDI port no longer exists." )
+            self.selectedMIDIPort = nil
+            self:CloseMIDI()
+        end
+
+    elseif self.selectedMIDIPort then
         self:OpenMIDI( self.selectedMIDIPort )
     end
 end
