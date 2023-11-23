@@ -380,7 +380,7 @@ o p a s d a d
 D a D d 
 ]] )
 
-MKeyboard:RegisterSheet( "Zelda\"s Lullaby", "expanded", [[
+MKeyboard:RegisterSheet( "Zelda's Lullaby", "expanded", [[
 a dp opa dp a d j h dsap 
 a dp opa dp a d j h z 
 z lklkh 
@@ -610,7 +610,7 @@ f f uh o
 x x flv 
 ]] )
 
-MKeyboard:RegisterSheet( "Mariage d\"amour", "expanded", [[
+MKeyboard:RegisterSheet( "Mariage d'amour", "expanded", [[
 h h - j j - J J - j j - h h - d d - P P - o o - g g - D D - d D g D D D - g g - h h - j j - g g - s s - D
 D - d d - s s D d z - d - o P d s d - o P d s d - o P D d D - o P D d D - D d D f g - g h g h d z - 
 h J z l z - h J z l z - h J Z z Z - h J Z z Z - Z z Z x c - c v c v z J - d d D D - s s j j - s s d d - P 
@@ -703,7 +703,7 @@ passdapo ppaspohhd ppaspsdapo | ppaspodddfd | sdfsdddfdo paspdfd | opspffd opspd
 opspsdapoods | opspffd opsphasap opspsdapoods 
 ]] )
 
-MKeyboard:RegisterSheet( "I\"m Blue", "expanded", [[
+MKeyboard:RegisterSheet( "I'm Blue", "expanded", [[
 PyoPsipPoPdDods | PyoPsipPoPdDods | PyoPsipPoPdDods | PyoPptioEioiop
 ]] )
 
@@ -803,7 +803,7 @@ oa[psf][pdg][psf][OpD][psf][sfj][fjl] oafgfDfjl
 [sfj][dGk][fjl][Gkz][Gjl][Gkz][Gjl][dGj][sdG][osd][9os][07o]q9 jklzlzljGdsoq9
 ]] )
 
-MKeyboard:RegisterSheet( "Bowser\"s Theme | Super Mario 64", "expanded", [[
+MKeyboard:RegisterSheet( "Bowser's Theme | Super Mario 64", "expanded", [[
 9[96][2q][6e][%W] 96qeW
 [ey] {dsoytw [269]}
 [ey][ru][ti][yo][ey][ru][ti][yo]
@@ -876,7 +876,7 @@ s d [^ED] d D d [soiq]
 h H [qh] g D d [soiq]
 ]] )
 
-MKeyboard:RegisterSheet( "Merry Go Round | Howl\"s Moving Castle", "expanded", [[
+MKeyboard:RegisterSheet( "Merry Go Round | Howl's Moving Castle", "expanded", [[
 wtYo oiY YyYt tips ssdapa uOaDSa psap oiuioyu
 ]] )
 
@@ -1044,7 +1044,7 @@ u o p p a u u o p p a u
 yty tyu ttr re ew i(ru) uuu u u uuuu u uu uu
 ]] )
 
-MKeyboard:RegisterSheet( "Where\"s Hiccup | How to Train Your Dragon", "expanded", [[
+MKeyboard:RegisterSheet( "Where's Hiccup | How to Train Your Dragon", "expanded", [[
 [hsx] [cz] [hz] c [lx] t [hsx] [cz] [hz] c [lx] s [gj] [gj] k [gk] j h [fs] s [gijt] [gj] [hk] [hk]
 j h [fs] [flp] [gil] [koz] x [hsx] a p h [hix] v [koz] x [hsx] a p f [bl] v [hux] [hx] z [hkoz] x
 [Gjy] k [dglpy] [fostv] [dg] [ad] g [fs] [ep] [fs] [dgl] [dk] f g [fl] [dkow] [iqs] [gj] [gj]
