@@ -29,7 +29,7 @@ function ENT:EmitNote( note, velocity, instrument, automated )
     local data = MKeyboard.instruments[instrument]
 
     if not data then return end
-    if note < data.firstNote or note > data.lastNote then return end
+    if note < data.noteMin or note > data.noteMax then return end
 
     sound.Play( string.format( data.path, note ), self:GetPos(), 80, 100, velocity / 127 )
 

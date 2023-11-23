@@ -16,10 +16,18 @@ if SERVER then
     include( "mkeyboard/server/init.lua" )
 
     AddCSLuaFile( "mkeyboard/client/init.lua" )
+    AddCSLuaFile( "mkeyboard/client/settings.lua" )
+    AddCSLuaFile( "mkeyboard/client/piano.lua" )
+    AddCSLuaFile( "mkeyboard/client/interface.lua" )
+    AddCSLuaFile( "mkeyboard/client/midi.lua" )
 end
 
 if CLIENT then
     include( "mkeyboard/client/init.lua" )
+    include( "mkeyboard/client/settings.lua" )
+    include( "mkeyboard/client/piano.lua" )
+    include( "mkeyboard/client/interface.lua" )
+    include( "mkeyboard/client/midi.lua" )
 end
 
 -- Find and include data files
