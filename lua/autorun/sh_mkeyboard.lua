@@ -13,27 +13,37 @@ MKeyboard = {
 }
 
 if SERVER then
-    include( "mkeyboard/sv_init.lua" )
+    include( "mkeyboard/server/init.lua" )
 
-    AddCSLuaFile( "mkeyboard/data/instruments.lua" )
-    AddCSLuaFile( "mkeyboard/data/layouts.lua" )
-    AddCSLuaFile( "mkeyboard/data/sheets.lua" )
-
-    AddCSLuaFile( "mkeyboard/cl_init.lua" )
-    AddCSLuaFile( "mkeyboard/cl_keyboard.lua" )
-    AddCSLuaFile( "mkeyboard/cl_midi.lua" )
-    AddCSLuaFile( "mkeyboard/cl_ui.lua" )
+    AddCSLuaFile( "mkeyboard/client/init.lua" )
+    AddCSLuaFile( "mkeyboard/client/settings.lua" )
+    AddCSLuaFile( "mkeyboard/client/piano.lua" )
+    AddCSLuaFile( "mkeyboard/client/interface.lua" )
+    AddCSLuaFile( "mkeyboard/client/midi.lua" )
 end
 
 if CLIENT then
-    include( "mkeyboard/data/instruments.lua" )
-    include( "mkeyboard/data/layouts.lua" )
-    include( "mkeyboard/data/sheets.lua" )
+    include( "mkeyboard/client/init.lua" )
+    include( "mkeyboard/client/settings.lua" )
+    include( "mkeyboard/client/piano.lua" )
+    include( "mkeyboard/client/interface.lua" )
+    include( "mkeyboard/client/midi.lua" )
+end
 
-    include( "mkeyboard/cl_init.lua" )
-    include( "mkeyboard/cl_keyboard.lua" )
-    include( "mkeyboard/cl_midi.lua" )
-    include( "mkeyboard/cl_ui.lua" )
+-- Find and include data files
+do
+    local dataDir = "mkeyboard/data/"
+    local files = file.Find( dataDir .. "*.lua", "LUA" )
 
-    MKeyboard:LoadSettings()
+    if SERVER then
+        for _, name in ipairs( files ) do
+            AddCSLuaFile( dataDir .. name )
+        end
+    end
+
+    if CLIENT then
+        for _, name in ipairs( files ) do
+            include( dataDir .. name )
+        end
+    end
 end

@@ -1,16 +1,3 @@
-MKeyboard.instruments = {}
-
-function MKeyboard:RegisterInstrument( name, path, firstNote, lastNote )
-    self.instruments[#self.instruments + 1] = {
-        name = name,
-        path = path,
-        firstNote = firstNote,
-        lastNote = lastNote
-    }
-end
-
--- default instruments
-
 MKeyboard:RegisterInstrument( "Grand Piano", "styledstrike/instruments/grand_piano/%i.mp3", 24, 96 )
 MKeyboard:RegisterInstrument( "Grand Piano (Soft)", "styledstrike/instruments/grand_piano_2/%i.mp3", 24, 96 )
 MKeyboard:RegisterInstrument( "Electric Piano", "styledstrike/instruments/electric_piano/%i.mp3", 24, 96 )

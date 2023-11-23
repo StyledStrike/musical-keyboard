@@ -1,17 +1,6 @@
-MKeyboard.layouts = {}
-
-function MKeyboard:RegisterLayout( name, keys, octaveLimits )
-    self.layouts[#self.layouts + 1] = {
-        name = name,
-        keys = keys,
-        octaveLimits = octaveLimits
-    }
-end
-
--- default keyboard layouts
-
-MKeyboard:RegisterLayout( "Compact", {
-    -- button, note, isBlack
+-- Default layout from Playable Piano
+MKeyboard:RegisterLayout( "compact", "musicalk.layout.compact", {
+    -- button, note, is a black key
     { KEY_A, 60 },
     { KEY_W, 61, true },
     { KEY_S, 62 },
@@ -30,12 +19,11 @@ MKeyboard:RegisterLayout( "Compact", {
     { KEY_P, 75, true },
     { KEY_SEMICOLON, 76 },
     { KEY_APOSTROPHE, 77 }
-}, {
-    min = -3, max = 2
 } )
 
-MKeyboard:RegisterLayout( "Expanded", {
-    -- button, note, is black key, requires shift
+-- Expanded layout from Playable Piano
+MKeyboard:RegisterLayout( "expanded", "musicalk.layout.expanded", {
+    -- button, note, is a black key, requires shift
     { KEY_1, 36 },
     { KEY_1, 37, true, true },
     { KEY_2, 38 },
@@ -100,12 +88,11 @@ MKeyboard:RegisterLayout( "Expanded", {
     { KEY_B, 94, true, true },
     { KEY_N, 95 },
     { KEY_M, 96 }
-}, {
-    min = -2, max = 1
 } )
 
-MKeyboard:RegisterLayout( "FL Style", {
-    -- button, note, is black key, requires shift, alternative button
+-- Keyboard layout from FL Studio
+MKeyboard:RegisterLayout( "fl_studio", "FL Studio", {
+    -- button, note, is a black key, requires shift, alternative button
     { KEY_Z, 24 },
     { KEY_S, 25, true },
     { KEY_X, 26 },
@@ -139,6 +126,4 @@ MKeyboard:RegisterLayout( "FL Style", {
     { KEY_LBRACKET, 53 },
     { KEY_EQUAL, 54, true },
     { KEY_RBRACKET, 55 }
-}, {
-    min = 0, max = 3
 } )

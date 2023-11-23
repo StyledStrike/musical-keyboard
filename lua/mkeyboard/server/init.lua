@@ -1,7 +1,7 @@
 resource.AddWorkshop( "2656563609" )
 
-util.AddNetworkString( "mkeyboard.set_entity" )
 util.AddNetworkString( "mkeyboard.notes" )
+util.AddNetworkString( "mkeyboard.set_current_keyboard" )
 
 CreateConVar(
     "sbox_maxmusical_keyboards",
@@ -11,8 +11,7 @@ CreateConVar(
     0
 )
 
-local function FindBroadcastTargets( pos, radius, ignore )
-    -- make the radius squared, to compare with DistToSqr (faster) 
+local function FindTargets( pos, radius, ignore )
     radius = radius * radius
 
     local found = {}
@@ -30,11 +29,13 @@ local function IsAMusicalKeyboard( ent )
     return IsValid( ent ) and ent:GetClass() == "ent_musical_keyboard"
 end
 
+MKeyboard.IsAMusicalKeyboard = IsAMusicalKeyboard
+
 local function BroadcastNotes( notes, ent, automated, ignorePlayer )
     if #notes == 0 then return end
 
-    -- only broadcast to nearby players, if any
-    local targets = FindBroadcastTargets( ent:GetPos(), MKeyboard.NET_BROADCAST_DISTANCE, ignorePlayer )
+    -- Only broadcast to nearby players, if any
+    local targets = FindTargets( ent:GetPos(), MKeyboard.NET_BROADCAST_DISTANCE, ignorePlayer )
     if #targets == 0 then return end
 
     net.Start( "mkeyboard.notes", false )
@@ -52,7 +53,9 @@ local function BroadcastNotes( notes, ent, automated, ignorePlayer )
     net.Send( targets )
 end
 
-concommand.Add( "keyboard_leave", function( ply, _, args )
+MKeyboard.BroadcastNotes = BroadcastNotes
+
+concommand.Add( "musical_keyboard_leave", function( ply, _, args )
     if #args < 1 then return end
     local ent = ents.GetByIndex( args[1] )
 
@@ -64,20 +67,20 @@ end )
 net.Receive( "mkeyboard.notes", function( _, ply )
     local ent = net.ReadEntity()
 
-    -- make sure the client didnt send the wrong entity
+    -- Make sure the client didnt send the wrong entity
     if not IsAMusicalKeyboard( ent ) then return end
 
-    -- make sure the client is actually using this keyboard
+    -- Make sure the client is actually using this keyboard
     if ply ~= ent.Ply then return end
 
     local automated = net.ReadBool()
     local noteCount = net.ReadUInt( 5 )
     local notes = {}
 
-    -- make sure the client isn't tricking us
+    -- Make sure the client isn't trying to send too many notes
     noteCount = math.Clamp( noteCount, 1, MKeyboard.NET_MAX_NOTES )
 
-    -- read all notes, to make sure we have as
+    -- Read all notes, to make sure we have as
     -- many as the client told us
     for i = 1, noteCount do
         notes[i] = {
@@ -88,22 +91,22 @@ net.Receive( "mkeyboard.notes", function( _, ply )
         }
     end
 
-    -- then broadcast the notes
+    -- Then broadcast those notes
     BroadcastNotes( notes, ent, automated, ply )
 end )
 
--- Workaround for hooks that only run serverside on single-player
+-- Workaround for button hooks that only run serverside on single-player
 if game.SinglePlayer() then
     util.AddNetworkString( "mkeyboard.key" )
 
-    hook.Add( "PlayerButtonDown", "mkeyboard_ButtonDownWorkaround", function( ply, button )
+    hook.Add( "PlayerButtonDown", "mkeyboard.ButtonDownWorkaround", function( ply, button )
         net.Start( "mkeyboard.key", true )
         net.WriteUInt( button, 8 )
         net.WriteBool( true )
         net.Send( ply )
     end )
 
-    hook.Add( "PlayerButtonUp", "mkeyboard_ButtonUpWorkaround", function( ply, button )
+    hook.Add( "PlayerButtonUp", "mkeyboard.ButtonUpWorkaround", function( ply, button )
         net.Start( "mkeyboard.key", true )
         net.WriteUInt( button, 8 )
         net.WriteBool( false )
