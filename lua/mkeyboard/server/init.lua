@@ -91,6 +91,8 @@ net.Receive( "mkeyboard.notes", function( _, ply )
         }
     end
 
+    ent:OnReceiveNotes( notes )
+
     -- Then broadcast those notes
     BroadcastNotes( notes, ent, automated, ply )
 end )
