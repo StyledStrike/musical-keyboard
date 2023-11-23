@@ -68,7 +68,7 @@ function MKeyboard:Init( ent )
             queueStart = t
         end
 
-        -- Add notes to the queue unless the limit is was reached
+        -- Add notes to the queue unless the limit was reached
         local noteCount = #transmitQueue
         if noteCount < self.NET_MAX_NOTES then
             transmitQueue[noteCount + 1] = {
@@ -399,7 +399,7 @@ function MKeyboard:OpenInterface()
             offset = DrawText(
                 transpose > 0 and "+" .. transpose or transpose,
                 "MKeyboard_Key",
-                x + pianoW, y, colors.white,
+                x + pianoW, y, colors.manual,
                 TEXT_ALIGN_RIGHT
             )
 
