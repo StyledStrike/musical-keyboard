@@ -65,6 +65,8 @@ concommand.Add( "musical_keyboard_leave", function( ply, _, args )
 end )
 
 net.Receive( "mkeyboard.notes", function( _, ply )
+    if not ply:Alive() then return end
+
     local ent = net.ReadEntity()
 
     -- Make sure the client didnt send the wrong entity

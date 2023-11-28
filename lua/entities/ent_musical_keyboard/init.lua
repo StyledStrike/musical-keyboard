@@ -2,6 +2,8 @@ AddCSLuaFile( "cl_init.lua" )
 AddCSLuaFile( "shared.lua" )
 include( "shared.lua" )
 
+local MAX_USE_DISTANCE = 300 * 300
+
 local function MakeKeyboardSpawner( ply, data )
     if IsValid( ply ) and not ply:CheckLimit( "musical_keyboards" ) then return end
 
@@ -68,7 +70,11 @@ function ENT:Use( ply )
 end
 
 function ENT:SetPlayer( ply )
-    if not IsValid( self.Ply ) then
+    if IsValid( self.Ply ) and not self.Ply:Alive() then
+        self.Ply = nil
+    end
+
+    if not IsValid( self.Ply ) and ply:Alive() then
         net.Start( "mkeyboard.set_current_keyboard", false )
         net.WriteEntity( self )
         net.Send( ply )
@@ -82,12 +88,27 @@ function ENT:RemovePlayer()
         net.Start( "mkeyboard.set_current_keyboard", false )
         net.WriteEntity( nil )
         net.Send( self.Ply )
-
-        self.Ply = nil
     end
+
+    self.Ply = nil
+end
+
+function ENT:Think()
+    self:NextThink( CurTime() )
+    self:UpdateNotes()
+
+    if IsValid( self.Ply ) and (
+        not self.Ply:Alive() or
+        self.Ply:GetPos():DistToSqr( self:GetPos() ) > MAX_USE_DISTANCE
+    ) then
+        self:RemovePlayer()
+    end
+
+    return true
 end
 
 if not WireLib then
+    function ENT:UpdateNotes() end
     function ENT:OnReceiveNotes() end
     return
 end
@@ -141,9 +162,7 @@ end
 
 local GetKeys = table.GetKeys
 
-function ENT:Think()
-    self:NextThink( CurTime() )
-
+function ENT:UpdateNotes()
     local now = SysTime()
 
     -- If the queued notes are ready to be sent...
@@ -165,6 +184,4 @@ function ENT:Think()
             queue[t] = nil
         end
     end
-
-    return true
 end
