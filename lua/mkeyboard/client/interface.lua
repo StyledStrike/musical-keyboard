@@ -50,7 +50,7 @@ function MKeyboard:Init( ent )
     self:SetTranspose()
     self:SetLayoutByIndex()
 
-    self.piano.OnNoteOn = function( note, velocity, instrument )
+    self.piano.OnNoteOn = function( note, velocity, instrument, automated )
         instrument = instrument or self.settings.instrument
 
         local data = self.instruments[instrument] or self.instruments[1]

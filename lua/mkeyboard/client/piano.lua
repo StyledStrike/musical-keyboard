@@ -77,14 +77,15 @@ function Piano:FindKeyByNote( note )
 end
 
 --- Press the key linked to this note.
-function Piano:PressNote( note, velocity, instrument, color )
+function Piano:PressNote( note, velocity, instrument, color, automated )
     local key = self:FindKeyByNote( note )
 
     if key then
         key.color = color
         key.isPressed = true
-        self.OnNoteOn( note, velocity, instrument )
     end
+
+    self.OnNoteOn( note, velocity, instrument, automated )
 end
 
 --- Release the key linked to this note.

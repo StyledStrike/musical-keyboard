@@ -72,7 +72,7 @@ function MKeyboard:OnMIDIEvent( code, p1, p2 )
         local instrument = self.settings.channelInstruments[channel]
 
         self.lastNoteWasAutomated = true
-        self.piano:PressNote( p1 + transpose, p2, instrument, self.colors.manual )
+        self.piano:PressNote( p1 + transpose, p2, instrument, self.colors.automated, true )
         self.channelState[channel] = 1
 
     elseif cmd == "NOTE_OFF" then
