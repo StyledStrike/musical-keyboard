@@ -512,7 +512,7 @@ function MKeyboard:OpenInterface()
     -- Transpose
     local rowTranspose = AddRow( "musicalk.vkeys.transpose", "DNumSlider" )
     rowTranspose:SetMin( -24 )
-    rowTranspose:SetMax( 24 )
+    rowTranspose:SetMax( 42 )
     rowTranspose:SetDecimals( 0 )
     rowTranspose:SetValue( settings.transpose )
     rowTranspose.Label:SetTextColor( colors.black )
