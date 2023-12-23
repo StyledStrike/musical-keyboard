@@ -153,7 +153,7 @@ function MKeyboard:Shutdown()
     hook.Remove( "PlayerButtonDown", "MKeyboard.DetectButtonPress" )
     hook.Remove( "PlayerButtonUp", "MKeyboard.DetectButtonRelease" )
     hook.Remove( "PlayerBindPress", "MKeyboard.BlockBinds" )
-    hook.Remove( "BlockChatInput", "MKeyboard.PreventOpeningChat" )
+    hook.Remove( "CustomChatBlockInput", "MKeyboard.PreventOpeningChat" )
 end
 
 local settings = MKeyboard.settings
