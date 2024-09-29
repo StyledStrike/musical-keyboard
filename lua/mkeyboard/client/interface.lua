@@ -717,7 +717,7 @@ function MKeyboard:ShowChannelsDialog()
         return
     end
 
-    local tall = math.min( 610, ScrH() * 0.6 )
+    local tall = math.min( 630, ScrH() * 0.6 )
 
     self.frameChannels = vgui.Create( "DFrame" )
     self.frameChannels:SetSize( 400, tall )
@@ -737,6 +737,28 @@ function MKeyboard:ShowChannelsDialog()
 
     self.frameChannels.OnKeyCodeReleased = function( _, key )
         self:OnButtonRelease( key )
+    end
+
+    local presetsControl = vgui.Create( "ControlPresets", self.frameChannels )
+    presetsControl:Dock( TOP )
+    presetsControl:DockMargin( 0, 0, 0, 4 )
+    presetsControl:SetPreset( "musical_keyboard" )
+    presetsControl._comboBoxes = {}
+    presetsControl.OnSelect = function( s, _, _, data )
+        for k, v in pairs( data ) do
+            local combo = s._comboBoxes[tonumber( k )]
+
+            combo:ChooseOptionID( tonumber( v ) + 2 )
+        end
+    end
+    presetsControl.QuickSaveInternal = function( s, text )
+        local tabValues = {}
+        for i, v in ipairs( s:GetConVars() ) do
+            tabValues[v] = tostring( settings.channelInstruments[i - 1] or -1 )
+        end
+
+        presets.Add( s.m_strPreset, text, tabValues )
+        s:Update()
     end
 
     local scrollChannels = vgui.Create( "DScrollPanel", self.frameChannels )
@@ -799,5 +821,8 @@ function MKeyboard:ShowChannelsDialog()
 
         combo.channel = i
         combo.OnSelect = OnSelectInstrument
+
+        presetsControl:AddConVar( Format( "%.2d", i ) )
+        presetsControl._comboBoxes[i] = combo
     end
 end
