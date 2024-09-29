@@ -710,10 +710,6 @@ function MKeyboard:ShowDevicesDialog()
     end
 end
 
-local function FormatInstrumentIndex( index )
-    return Format( "%.2d", index )
-end
-
 function MKeyboard:ShowChannelsDialog()
     if IsValid( self.frameChannels ) then
         self.frameChannels:Close()
@@ -748,7 +744,7 @@ function MKeyboard:ShowChannelsDialog()
     presetsControl:DockMargin( 0, 0, 0, 4 )
     presetsControl:SetPreset( "musical_keyboard" )
     presetsControl._comboBoxes = {}
-    presetsControl.OnSelect = function( s, index, value, data )
+    presetsControl.OnSelect = function( s, _, _, data )
         for k, v in pairs( data ) do
             local combo = s._comboBoxes[tonumber( k )]
 
@@ -758,7 +754,7 @@ function MKeyboard:ShowChannelsDialog()
     presetsControl.QuickSaveInternal = function( s, text )
         local tabValues = {}
         for i, v in ipairs( s:GetConVars() ) do
-            tabValues[ FormatInstrumentIndex(i - 1) ] = tostring( settings.channelInstruments[i - 1] or -1 )
+            tabValues[v] = tostring( settings.channelInstruments[i - 1] or -1 )
         end
 
         presets.Add( s.m_strPreset, text, tabValues )
@@ -826,7 +822,7 @@ function MKeyboard:ShowChannelsDialog()
         combo.channel = i
         combo.OnSelect = OnSelectInstrument
 
-        presetsControl:AddConVar( FormatInstrumentIndex(i) )
+        presetsControl:AddConVar( Format( "%.2d", i ) )
         presetsControl._comboBoxes[i] = combo
     end
 end
