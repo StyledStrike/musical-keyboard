@@ -2,12 +2,17 @@ MKeyboard.settings = MKeyboard.settings or {
     layout = 1,
     instrument = 1,
     sheet = 0,
+
     velocity = 127,
     transpose = 0,
     midiTranspose = 0,
     drawKeyLabels = true,
-    channelInstruments = {}
+
+    midiCurrentPreset = nil,
+    midiChannelPresets = {}
 }
+
+MKeyboard.channelInstruments = {}
 
 local function ValidateInteger( n, min, max )
     return math.Round( math.Clamp( tonumber( n ), min, max ) )
@@ -21,47 +26,62 @@ function MKeyboard:LoadSettings()
     local instrumentCount = #self.instruments
     local settings = self.settings
 
-    -- last layout that was used on the keyboard
+    -- Last layout that was used on the keyboard
     if data.layout then
         settings.layout = ValidateInteger( data.layout, 1, #self.layouts )
     end
 
-    -- last instrument that was used on the keyboard
+    -- Last instrument that was used on the keyboard
     if data.instrument then
         settings.instrument = ValidateInteger( data.instrument, 1, instrumentCount )
     end
 
-    -- last selected sheet
+    -- Last selected sheet
     if data.sheet then
         settings.sheet = ValidateInteger( data.sheet, 0, #self.sheets )
     end
 
-    -- last used velocity
+    -- Last used velocity
     if data.velocity then
         settings.velocity = ValidateInteger( data.velocity, 1, 127 )
     end
 
-    -- last used transpose
+    -- Last used transpose
     if data.transpose then
         settings.transpose = ValidateInteger( data.transpose, -48, 48 )
     end
 
-    -- last transpose that was used with midi
+    -- Last transpose that was used with midi
     if data.midiTranspose then
         settings.midiTranspose = ValidateInteger( data.midiTranspose, -48, 48 )
     end
 
-    -- draw labels for keys
+    -- Draw labels for keys
     settings.drawKeyLabels = Either( isbool( data.drawKeyLabels ), tobool( data.drawKeyLabels ), true )
 
-    -- links between instruments and MIDI channels
-    if data.channelInstruments and type( data.channelInstruments ) == "table" then
-        for c, i in pairs( data.channelInstruments ) do
-            local channel = ValidateInteger( c, 0, 15 )
-            local instrument = ValidateInteger( i, 1, instrumentCount )
+    -- Presets for links between MIDI channels and instruments
+    settings.midiChannelPresets = {}
 
-            settings.channelInstruments[channel] = instrument
+    if data.midiChannelPresets and type( data.midiChannelPresets ) == "table" then
+        for name, channelInstruments in pairs( data.midiChannelPresets ) do
+            if type( name ) == "string" and type( data ) == "table" then
+                self:SetMIDIChannelPreset( name, channelInstruments )
+            end
         end
+    end
+
+    settings.midiCurrentPreset = Either( type( data.midiCurrentPreset ) == "string", data.midiCurrentPreset, nil )
+
+    if settings.midiCurrentPreset then
+        self:SetCurrentChannelPreset()
+    end
+
+    -- Create preset from a old data format
+    if data.channelInstruments and type( data.channelInstruments ) == "table" then
+        local name = language.GetPhrase( "musicalk.channels" )
+
+        self:SetMIDIChannelPreset( name, data.channelInstruments )
+        self:SetCurrentChannelPreset( name )
     end
 end
 
@@ -74,11 +94,46 @@ function MKeyboard:SaveSettings()
             layout              = settings.layout,
             instrument          = settings.instrument,
             sheet               = settings.sheet,
+
             velocity            = settings.velocity,
             transpose           = settings.transpose,
             midiTranspose       = settings.midiTranspose,
-            channelInstruments  = settings.channelInstruments,
-            drawKeyLabels       = settings.drawKeyLabels
+            drawKeyLabels       = settings.drawKeyLabels,
+
+            midiCurrentPreset   = settings.midiCurrentPreset,
+            midiChannelPresets  = settings.midiChannelPresets
         }, true )
     )
+end
+
+function MKeyboard:SetMIDIChannelPreset( name, channelInstruments )
+    channelInstruments = channelInstruments or {}
+
+    local preset = {}
+    local itemCount = 0
+    local instrumentCount = #self.instruments
+
+    for channelIndex, instrumentIndex in pairs( channelInstruments ) do
+        channelIndex = ValidateInteger( channelIndex, self.FIRST_MIDI_CHANNEL, self.LAST_MIDI_CHANNEL )
+        instrumentIndex = ValidateInteger( instrumentIndex, 1, instrumentCount )
+
+        itemCount = itemCount + 1
+        preset[channelIndex] = instrumentIndex
+    end
+
+    self.settings.midiChannelPresets[name] = Either( itemCount > 0, preset, nil )
+end
+
+function MKeyboard:SetCurrentChannelPreset( name )
+    name = name or self.settings.midiCurrentPreset
+
+    local channelInstruments = {}
+    local preset = Either( name == nil, {}, self.settings.midiChannelPresets[name] or {} )
+
+    for channelIndex, instrumentIndex in pairs( preset ) do
+        channelInstruments[channelIndex] = instrumentIndex
+    end
+
+    self.settings.midiCurrentPreset = name
+    self.channelInstruments = channelInstruments
 end

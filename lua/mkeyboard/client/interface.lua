@@ -721,7 +721,7 @@ function MKeyboard:ShowChannelsDialog()
 
     self.frameChannels = vgui.Create( "DFrame" )
     self.frameChannels:SetSize( 400, tall )
-    self.frameChannels:SetTitle( language.GetPhrase( "musicalk.channels" ) )
+    self.frameChannels:SetTitle( "#musicalk.channels" )
     self.frameChannels:SetVisible( true )
     self.frameChannels:SetSizable( true )
     self.frameChannels:SetDraggable( true )
@@ -739,28 +739,106 @@ function MKeyboard:ShowChannelsDialog()
         self:OnButtonRelease( key )
     end
 
-    local presetsControl = vgui.Create( "ControlPresets", self.frameChannels )
-    presetsControl:Dock( TOP )
-    presetsControl:DockMargin( 0, 0, 0, 4 )
-    presetsControl:SetPreset( "musical_keyboard" )
-    presetsControl._comboBoxes = {}
-    presetsControl.OnSelect = function( s, _, _, data )
-        for k, v in pairs( data ) do
-            local combo = s._comboBoxes[tonumber( k )]
+    -- Update the channel combo boxes with the instruments from the current preset
+    local channelCombos = {}
 
-            combo:ChooseOptionID( tonumber( v ) + 2 )
+    local UpdateCombosFromCurrentPreset = function()
+        local preset = settings.midiChannelPresets[settings.midiCurrentPreset or ""] or {}
+
+        for channelIndex = self.FIRST_MIDI_CHANNEL, self.LAST_MIDI_CHANNEL do
+            local combo = channelCombos[channelIndex]
+
+            combo._isBeingModifiedByCode = true
+
+            if preset[channelIndex] then
+                combo:ChooseOptionID( preset[channelIndex] + 2 )
+            else
+                combo:ChooseOptionID( 1 )
+            end
+
+            combo._isBeingModifiedByCode = nil
         end
     end
-    presetsControl.QuickSaveInternal = function( s, text )
-        local tabValues = {}
-        for i, v in ipairs( s:GetConVars() ) do
-            tabValues[v] = tostring( settings.channelInstruments[i - 1] or -1 )
-        end
 
-        presets.Add( s.m_strPreset, text, tabValues )
-        s:Update()
+    -- Channel presets list
+    local panelPresets = vgui.Create( "DPanel", self.frameChannels )
+    panelPresets:SetTall( 24 )
+    panelPresets:Dock( TOP )
+    panelPresets:DockMargin( 0, 0, 0, 2 )
+
+    local comboPresets = vgui.Create( "DComboBox", panelPresets )
+    comboPresets:SetSortItems( false )
+    comboPresets:Dock( FILL )
+
+    comboPresets.OnSelect = function( s, _, name )
+        if s._isBeingModifiedByCode then return end
+
+        self:SetCurrentChannelPreset( name )
+        self:SaveSettings()
+
+        UpdateCombosFromCurrentPreset()
     end
 
+    -- Update the list of preset choices
+    local UpdatePresetList = function()
+        comboPresets:Clear()
+        comboPresets._isBeingModifiedByCode = true
+
+        for name, _ in SortedPairs( settings.midiChannelPresets, false ) do
+            comboPresets:AddChoice( name, nil, name == settings.midiCurrentPreset )
+        end
+
+        comboPresets._isBeingModifiedByCode = nil
+    end
+
+    UpdatePresetList()
+
+    local buttonDeletePreset = vgui.Create( "DImageButton", panelPresets )
+    buttonDeletePreset:SetWide( 22 )
+    buttonDeletePreset:SetTooltip( "#preset.delete" )
+    buttonDeletePreset:SetImage( "icon16/delete.png" )
+    buttonDeletePreset:SetStretchToFit( false )
+    buttonDeletePreset:Dock( RIGHT )
+
+    buttonDeletePreset.DoClick = function()
+        local name = settings.midiCurrentPreset
+
+        if name then
+            settings.midiChannelPresets[name] = nil
+            settings.midiCurrentPreset = nil
+        end
+
+        self:SetCurrentChannelPreset()
+        self:SaveSettings()
+
+        UpdatePresetList()
+        UpdateCombosFromCurrentPreset()
+    end
+
+    local buttonAddPreset = vgui.Create( "DImageButton", panelPresets )
+    buttonAddPreset:SetWide( 22 )
+    buttonAddPreset:SetTooltip( "#preset.add" )
+    buttonAddPreset:SetImage( "icon16/add.png" )
+    buttonAddPreset:SetStretchToFit( false )
+    buttonAddPreset:Dock( RIGHT )
+
+    buttonAddPreset.DoClick = function()
+        Derma_StringRequest( "#preset.saveas_title", "#preset.saveas_desc", "", function( text )
+            if not text or text:Trim() == "" then
+                presets.BadNameAlert()
+                return
+            end
+
+            self:SetMIDIChannelPreset( text, self.channelInstruments )
+            self:SetCurrentChannelPreset( text )
+            self:SaveSettings()
+
+            UpdatePresetList()
+            UpdateCombosFromCurrentPreset()
+        end )
+    end
+
+    -- Channels list
     local scrollChannels = vgui.Create( "DScrollPanel", self.frameChannels )
     scrollChannels:Dock( FILL )
 
@@ -771,58 +849,71 @@ function MKeyboard:ShowChannelsDialog()
         SetColor( 50, 50, 50, 255 )
         DrawRect( 4, 4, 8, h - 8 )
 
-        self.channelState[s.channel] = Lerp( FrameTime() * 8, self.channelState[s.channel], 0 )
+        self.channelState[s._channelIndex] = Lerp( FrameTime() * 8, self.channelState[s._channelIndex], 0 )
 
-        SetColor( colors.automated.r, colors.automated.g, colors.automated.b, 255 * self.channelState[s.channel] )
+        SetColor( colors.automated.r, colors.automated.g, colors.automated.b, 255 * self.channelState[s._channelIndex] )
         DrawRect( 4, 4, 8, h - 8 )
     end
 
-    local function OnSelectInstrument( s, _, _, idx )
-        if idx == -1 then
-            settings.channelInstruments[s.channel] = nil
-        else
-            settings.channelInstruments[s.channel] = idx
+    local function OnSelectInstrument( s, _, _, instrumentIndex )
+        if s._isBeingModifiedByCode then return end
+
+        instrumentIndex = tonumber( instrumentIndex )
+
+        local name = settings.midiCurrentPreset or ""
+        local preset = settings.midiChannelPresets[name]
+
+        if not preset then
+            -- Create a "default" preset
+            name = language.GetPhrase( "musicalk.channels" )
+
+            settings.midiCurrentPreset = name
+            settings.midiChannelPresets[name] = {}
+
+            preset = settings.midiChannelPresets[name]
+            UpdatePresetList()
         end
 
+        preset[s._channelIndex] = instrumentIndex
+
+        self:SetCurrentChannelPreset()
         self:SaveSettings()
     end
 
-    for i = 0, 15 do
-        self.channelState[i] = 0
+    for channelIndex = self.FIRST_MIDI_CHANNEL, self.LAST_MIDI_CHANNEL do
+        self.channelState[channelIndex] = 0
 
         local panelChannel = vgui.Create( "DPanel", scrollChannels )
         panelChannel:SetSize( wide, 32 )
         panelChannel:Dock( TOP )
         panelChannel:DockMargin( 0, 0, 0, 4 )
 
-        panelChannel.channel = i
+        panelChannel._channelIndex = channelIndex
         panelChannel.Paint = PaintChannel
 
         local labelIndex = vgui.Create( "DLabel", panelChannel )
         labelIndex:SetFont( "Trebuchet24" )
         labelIndex:SetTextColor( colors.white )
-        labelIndex:SetText( "#" .. ( i + 1 ) )
+        labelIndex:SetText( "##" .. channelIndex )
         labelIndex:SetWide( 50 )
         labelIndex:Dock( LEFT )
         labelIndex:DockMargin( 20, 0, 0, 0 )
 
         local combo = vgui.Create( "DComboBox", panelChannel )
         combo:SetSortItems( false )
-        combo:AddChoice( language.GetPhrase( "musicalk.channels.usecurrent" ), -1, true )
-        combo:AddChoice( language.GetPhrase( "musicalk.channels.mute" ), 0 )
+        combo:AddChoice( "#musicalk.channels.usecurrent" )
+        combo:AddChoice( "#musicalk.channels.mute", 0 )
         combo:AddSpacer()
         combo:Dock( FILL )
 
-        local myInstrument = settings.channelInstruments[i] or -1
-
-        for idx, v in ipairs( self.instruments ) do
-            combo:AddChoice( v.name, idx, idx == myInstrument )
+        for i, v in ipairs( self.instruments ) do
+            combo:AddChoice( v.name, i )
         end
 
-        combo.channel = i
+        combo._channelIndex = channelIndex
         combo.OnSelect = OnSelectInstrument
-
-        presetsControl:AddConVar( Format( "%.2d", i ) )
-        presetsControl._comboBoxes[i] = combo
+        channelCombos[channelIndex] = combo
     end
+
+    UpdateCombosFromCurrentPreset()
 end

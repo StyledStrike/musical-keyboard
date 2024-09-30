@@ -8,6 +8,10 @@ MKeyboard = {
     -- name/location of the settings file
     SETTINGS_FILE = "musical_keyboard.json",
 
+    -- MIDI constants
+    FIRST_MIDI_CHANNEL = 0,
+    LAST_MIDI_CHANNEL = 15,
+
     -- URL for the midi installation guide
     URL_MIDI_GUIDE = "https://steamcommunity.com/workshop/filedetails/discussion/2656563609/3199240042192880687/"
 }
