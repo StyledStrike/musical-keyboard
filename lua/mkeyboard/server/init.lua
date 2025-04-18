@@ -99,6 +99,16 @@ net.Receive( "mkeyboard.notes", function( _, ply )
     BroadcastNotes( notes, ent, automated, ply )
 end )
 
+hook.Add( "CanUndo", "MKeyboard.BlockUndo", function( ply, undo )
+    if not undo.Entities then return end
+
+    local ent = undo.Entities[1]
+
+    if IsAMusicalKeyboard( ent ) and ply == ent.Ply then
+        return false
+    end
+end )
+
 -- Workaround for button hooks that only run serverside on single-player
 if game.SinglePlayer() then
     util.AddNetworkString( "mkeyboard.key" )
