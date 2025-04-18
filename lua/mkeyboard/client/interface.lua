@@ -124,9 +124,18 @@ function MKeyboard:Init( ent )
     end )
 
     -- Custom Chat compatibility
-    hook.Add( "CustomChatBlockInput", "MKeyboard.PreventOpeningChat", function()
-        return true
-    end )
+    if CustomChat then
+        hook.Add( "CustomChatBlockInput", "MKeyboard.PreventOpeningChat", function()
+            return true
+        end )
+    end
+
+    -- Easychat compatibility
+    if EasyChat then
+        hook.Add( "StartChat", "MKeyboard.PreventOpeningChat", function()
+            return true
+        end)
+    end
 
     if not self.isMIDIAvailable then return end
 
@@ -154,6 +163,7 @@ function MKeyboard:Shutdown()
     hook.Remove( "PlayerButtonUp", "MKeyboard.DetectButtonRelease" )
     hook.Remove( "PlayerBindPress", "MKeyboard.BlockBinds" )
     hook.Remove( "CustomChatBlockInput", "MKeyboard.PreventOpeningChat" )
+    hook.Remove( "StartChat", "MKeyboard.PreventOpeningChat" )
 end
 
 local settings = MKeyboard.settings
