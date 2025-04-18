@@ -134,7 +134,7 @@ function MKeyboard:Init( ent )
     if EasyChat then
         hook.Add( "StartChat", "MKeyboard.PreventOpeningChat", function()
             return true
-        end)
+        end )
     end
 
     if not self.isMIDIAvailable then return end
