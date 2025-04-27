@@ -507,6 +507,20 @@ function MKeyboard:OpenInterface()
         rowDrawLabels:SetIcon( settings.drawKeyLabels and "icon16/accept.png" or "icon16/cancel.png" )
     end
 
+    -- Should sort sheets alphabetically?
+    local rowSortSheets = AddRow( "musicalk.vkeys.sorting", "DImageButton" )
+    rowSortSheets:SetImage( settings.sortSheets and "icon16/accept.png" or "icon16/cancel.png" )
+    rowSortSheets:SetStretchToFit( false )
+    rowSortSheets:SetPaintBackground( true )
+
+    rowSortSheets.DoClick = function()
+        settings.sortSheets = not settings.sortSheets
+        self:UpdateSheetsList()
+        self:SaveSettings()
+
+        rowSortSheets:SetIcon( settings.sortSheets and "icon16/accept.png" or "icon16/cancel.png" )
+    end
+
     -- Velocity
     local rowVelocity = AddRow( "musicalk.vkeys.velocity", "DNumSlider" )
     rowVelocity:SetMin( 0 )
@@ -648,13 +662,26 @@ function MKeyboard:UpdateSheetsList()
     local selectedItem = self.sheetList:AddLine( language.GetPhrase( "musicalk.sheets.hidden" ) )
     selectedItem._sheetIndex = 0
 
-    for i, v in ipairs( self.sheets ) do
-        if v.layout == layoutId then
-            local line = self.sheetList:AddLine( v.title )
-            line._sheetIndex = i
-
-            if i == settings.sheet then
-                selectedItem = line
+    if settings.sortSheets then
+        for i, v in SortedPairsByMemberValue( self.sheets, "title" ) do
+            if v.layout == layoutId then
+                local line = self.sheetList:AddLine( v.title )
+                line._sheetIndex = i
+    
+                if i == settings.sheet then
+                    selectedItem = line
+                end
+            end
+        end
+    else
+        for i, v in ipairs( self.sheets ) do
+            if v.layout == layoutId then
+                local line = self.sheetList:AddLine( v.title )
+                line._sheetIndex = i
+    
+                if i == settings.sheet then
+                    selectedItem = line
+                end
             end
         end
     end
