@@ -662,26 +662,15 @@ function MKeyboard:UpdateSheetsList()
     local selectedItem = self.sheetList:AddLine( language.GetPhrase( "musicalk.sheets.hidden" ) )
     selectedItem._sheetIndex = 0
 
-    if settings.sortSheets then
-        for i, v in SortedPairsByMemberValue( self.sheets, "title" ) do
-            if v.layout == layoutId then
-                local line = self.sheetList:AddLine( v.title )
-                line._sheetIndex = i
+    local iterator = settings.sortSheets and SortedPairsByMemberValue or ipairs
 
-                if i == settings.sheet then
-                    selectedItem = line
-                end
-            end
-        end
-    else
-        for i, v in ipairs( self.sheets ) do
-            if v.layout == layoutId then
-                local line = self.sheetList:AddLine( v.title )
-                line._sheetIndex = i
+    for i, v in iterator( self.sheets, "title" ) do
+        if v.layout == layoutId then
+            local line = self.sheetList:AddLine( v.title )
+            line._sheetIndex = i
 
-                if i == settings.sheet then
-                    selectedItem = line
-                end
+            if i == settings.sheet then
+                selectedItem = line
             end
         end
     end
