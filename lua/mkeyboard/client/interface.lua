@@ -667,7 +667,7 @@ function MKeyboard:UpdateSheetsList()
             if v.layout == layoutId then
                 local line = self.sheetList:AddLine( v.title )
                 line._sheetIndex = i
-    
+
                 if i == settings.sheet then
                     selectedItem = line
                 end
@@ -678,7 +678,7 @@ function MKeyboard:UpdateSheetsList()
             if v.layout == layoutId then
                 local line = self.sheetList:AddLine( v.title )
                 line._sheetIndex = i
-    
+
                 if i == settings.sheet then
                     selectedItem = line
                 end
