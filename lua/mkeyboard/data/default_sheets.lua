@@ -161,7 +161,7 @@ MKeyboard:RegisterSheet( "Für Elise", "expanded", [[
 fDfDfadsp
 tupa uOas
 ufDfDfadsp
-tupa usap asdf ogfd ifds usda
+tupa usap asdf ogfd ifds udsa
 ufuffxDfDfDfDfDfDfadsp
 tupa uOas
 ufDfDfadsp
