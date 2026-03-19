@@ -8,6 +8,9 @@ function MKeyboard:RegisterInstrument( name, basePath, samples, params )
         assert( type( params ) == "table", "'params' must be a table!" )
     end
 
+    -- The sampling logic requires the notes to be in ascending order
+    table.SortByMember( samples, "note", true )
+
     local instrument = {
         name = name,
         basePath = basePath,
