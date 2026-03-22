@@ -39,9 +39,46 @@ MKeyboard:RegisterInstrument( "Grand Piano", "sound/musical_keyboard/instruments
     releaseTime = 0.15
 } )
 
---[[for i = 1, 7 do
-    print( ( "{ note = %d, fileName = \"C-%d.ogg\" }," ):format( MKeyboard.NoteNameToMidiNote( "C#" .. i ), i ) )
-end]]
+MKeyboard:RegisterInstrument( "Grand Piano (Soft)", "sound/musical_keyboard/instruments/grand_piano_soft", {
+    { note = 23, fileName = "B0.ogg" },
+    { note = 24, fileName = "C1.ogg" },
+    { note = 25, fileName = "C-1.ogg" },
+    { note = 28, fileName = "E1.ogg" },
+    { note = 31, fileName = "G1.ogg" },
+    { note = 35, fileName = "B1.ogg" },
+    { note = 36, fileName = "C2.ogg" },
+    { note = 37, fileName = "C-2.ogg" },
+    { note = 40, fileName = "E2.ogg" },
+    { note = 43, fileName = "G2.ogg" },
+    { note = 47, fileName = "B2.ogg" },
+    { note = 48, fileName = "C3.ogg" },
+    { note = 49, fileName = "C-3.ogg" },
+    { note = 52, fileName = "E3.ogg" },
+    { note = 55, fileName = "G3.ogg" },
+    { note = 59, fileName = "B3.ogg" },
+    { note = 60, fileName = "C4.ogg" },
+    { note = 61, fileName = "C-4.ogg" },
+    { note = 64, fileName = "E4.ogg" },
+    { note = 67, fileName = "G4.ogg" },
+    { note = 71, fileName = "B4.ogg" },
+    { note = 72, fileName = "C5.ogg" },
+    { note = 73, fileName = "C-5.ogg" },
+    { note = 76, fileName = "E5.ogg" },
+    { note = 79, fileName = "G5.ogg" },
+    { note = 83, fileName = "B5.ogg" },
+    { note = 84, fileName = "C6.ogg" },
+    { note = 85, fileName = "C-6.ogg" },
+    { note = 88, fileName = "E6.ogg" },
+    { note = 91, fileName = "G6.ogg" },
+    { note = 95, fileName = "B6.ogg" },
+    { note = 96, fileName = "C7.ogg" },
+    { note = 97, fileName = "C-7.ogg" },
+    { note = 100, fileName = "E7.ogg" },
+    { note = 103, fileName = "G7.ogg" },
+}, {
+    volume = 0.65,
+    releaseTime = 0.2
+} )
 
 MKeyboard:RegisterInstrument( "Honky Tonk", "sound/musical_keyboard/instruments/honky_tonk", {
     { note = 24, fileName = "C1.ogg" },
@@ -82,6 +119,81 @@ MKeyboard:RegisterInstrument( "Electric Piano", "sound/musical_keyboard/instrume
     { note = 96, fileName = "C7.ogg", loopStart = 2.182857, loopEnd = 3.016168 }
 }, {
     volume = 0.25
+} )
+
+MKeyboard:RegisterInstrument( "Analog Piano", "sound/musical_keyboard/instruments/analog_piano", {
+    { note = 23, fileName = "B0.ogg" },
+    { note = 24, fileName = "C1.ogg" },
+    { note = 25, fileName = "C-1.ogg" },
+    { note = 28, fileName = "E1.ogg" },
+    { note = 31, fileName = "G1.ogg" },
+    { note = 35, fileName = "B1.ogg" },
+    { note = 36, fileName = "C2.ogg" },
+    { note = 37, fileName = "C-2.ogg" },
+    { note = 40, fileName = "E2.ogg" },
+    { note = 43, fileName = "G2.ogg" },
+    { note = 47, fileName = "B2.ogg" },
+    { note = 48, fileName = "C3.ogg" },
+    { note = 49, fileName = "C-3.ogg" },
+    { note = 52, fileName = "E3.ogg" },
+    { note = 55, fileName = "G3.ogg" },
+    { note = 59, fileName = "B3.ogg" },
+    { note = 60, fileName = "C4.ogg" },
+    { note = 61, fileName = "C-4.ogg" },
+    { note = 64, fileName = "E4.ogg" },
+    { note = 67, fileName = "G4.ogg" },
+    { note = 71, fileName = "B4.ogg" },
+    { note = 72, fileName = "C5.ogg" },
+    { note = 73, fileName = "C-5.ogg" },
+    { note = 76, fileName = "E5.ogg" },
+    { note = 79, fileName = "G5.ogg" },
+    { note = 83, fileName = "B5.ogg" },
+    { note = 84, fileName = "C6.ogg" },
+    { note = 85, fileName = "C-6.ogg" },
+    { note = 88, fileName = "E6.ogg" },
+    { note = 91, fileName = "G6.ogg" },
+    { note = 95, fileName = "B6.ogg" },
+    { note = 96, fileName = "C7.ogg" },
+    { note = 97, fileName = "C-7.ogg" },
+    { note = 100, fileName = "E7.ogg" },
+    { note = 103, fileName = "G7.ogg" },
+}, {
+    volume = 0.6,
+    releaseTime = 0.3
+} )
+
+MKeyboard:RegisterInstrument( "Binary Piano", "sound/musical_keyboard/instruments/binary_piano", {
+    { note = 23, fileName = "B0.ogg" },
+    { note = 24, fileName = "C1.ogg" },
+    { note = 28, fileName = "E1.ogg" },
+    { note = 31, fileName = "G1.ogg" },
+    { note = 35, fileName = "B1.ogg" },
+    { note = 36, fileName = "C2.ogg" },
+    { note = 40, fileName = "E2.ogg" },
+    { note = 43, fileName = "G2.ogg" },
+    { note = 47, fileName = "B2.ogg" },
+    { note = 48, fileName = "C3.ogg" },
+    { note = 52, fileName = "E3.ogg" },
+    { note = 55, fileName = "G3.ogg" },
+    { note = 59, fileName = "B3.ogg" },
+    { note = 60, fileName = "C4.ogg" },
+    { note = 64, fileName = "E4.ogg" },
+    { note = 67, fileName = "G4.ogg" },
+    { note = 71, fileName = "B4.ogg" },
+    { note = 72, fileName = "C5.ogg" },
+    { note = 76, fileName = "E5.ogg" },
+    { note = 79, fileName = "G5.ogg" },
+    { note = 83, fileName = "B5.ogg" },
+    { note = 84, fileName = "C6.ogg" },
+    { note = 88, fileName = "E6.ogg" },
+    { note = 91, fileName = "G6.ogg" },
+    { note = 95, fileName = "B6.ogg" },
+    { note = 96, fileName = "C7.ogg" },
+    { note = 100, fileName = "E7.ogg" },
+    { note = 103, fileName = "G7.ogg" },
+}, {
+    volume = 0.6,
+    releaseTime = 0.4
 } )
 
 MKeyboard:RegisterInstrument( "New Age", "sound/musical_keyboard/instruments/new_age", {
