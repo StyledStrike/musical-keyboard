@@ -35,7 +35,7 @@ MKeyboard:RegisterInstrument( "Grand Piano", "sound/musical_keyboard/instruments
     { note = 100, fileName = "E7.ogg" },
     { note = 103, fileName = "G7.ogg" },
 }, {
-    volume = 0.6,
+    volume = 0.75,
     releaseTime = 0.15
 } )
 
@@ -76,7 +76,7 @@ MKeyboard:RegisterInstrument( "Grand Piano (Soft)", "sound/musical_keyboard/inst
     { note = 100, fileName = "E7.ogg" },
     { note = 103, fileName = "G7.ogg" },
 }, {
-    volume = 0.65,
+    volume = 0.7,
     releaseTime = 0.2
 } )
 
@@ -96,7 +96,7 @@ MKeyboard:RegisterInstrument( "Honky Tonk", "sound/musical_keyboard/instruments/
     { note = 96, fileName = "C7.ogg" },
     { note = 103, fileName = "G7.ogg" }
 }, {
-    volume = 0.35,
+    volume = 0.45,
     releaseTime = 0.2
 } )
 
@@ -118,7 +118,7 @@ MKeyboard:RegisterInstrument( "Electric Piano", "sound/musical_keyboard/instrume
     { note = 92, fileName = "G-6.ogg", loopStart = 2.564082, loopEnd = 3.397619 },
     { note = 96, fileName = "C7.ogg", loopStart = 2.182857, loopEnd = 3.016168 }
 }, {
-    volume = 0.25
+    volume = 0.35
 } )
 
 MKeyboard:RegisterInstrument( "Analog Piano", "sound/musical_keyboard/instruments/analog_piano", {
@@ -158,7 +158,7 @@ MKeyboard:RegisterInstrument( "Analog Piano", "sound/musical_keyboard/instrument
     { note = 100, fileName = "E7.ogg" },
     { note = 103, fileName = "G7.ogg" },
 }, {
-    volume = 0.6,
+    volume = 0.55,
     releaseTime = 0.3
 } )
 
@@ -192,7 +192,7 @@ MKeyboard:RegisterInstrument( "Binary Piano", "sound/musical_keyboard/instrument
     { note = 100, fileName = "E7.ogg" },
     { note = 103, fileName = "G7.ogg" },
 }, {
-    volume = 0.6,
+    volume = 0.7,
     releaseTime = 0.4
 } )
 
@@ -203,7 +203,7 @@ MKeyboard:RegisterInstrument( "New Age", "sound/musical_keyboard/instruments/new
     { note = 72, fileName = "C5.ogg", loopStart = 1.395170, loopEnd = 4.170136 },
     { note = 84, fileName = "C6.ogg", loopStart = 1.777007, loopEnd = 3.984444 },
 }, {
-    volume = 0.45
+    volume = 0.5
 } )
 
 MKeyboard:RegisterInstrument( "Choir Aahs", "sound/musical_keyboard/instruments/choir_aahs", {
@@ -224,7 +224,7 @@ MKeyboard:RegisterInstrument( "Choir Aahs", "sound/musical_keyboard/instruments/
     { note = 93, fileName = "A6.ogg", loopStart = 0.831469, loopEnd = 2.320781 },
 }, {
     releaseTime = 0.6,
-    volume = 0.33
+    volume = 0.4
 } )
 
 local function AddInstrumentWithNoteRange( name, basePath, startNote, endNote, extension, params )

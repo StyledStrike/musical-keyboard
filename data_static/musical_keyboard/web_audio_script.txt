@@ -48,8 +48,17 @@ const manager = {
         channelInterpretation: "speakers"
     }),
 
+    masterCompressorNode: new DynamicsCompressorNode(audioContext, {
+        threshold: -30,
+        knee: 5,
+        ratio: 1.5,
+        attack: 0.01,
+        release: 0.5
+    }),
+
     initialize() {
-        this.masterGainNode.connect(audioContext.destination);
+        this.masterGainNode.connect(this.masterCompressorNode);
+        this.masterCompressorNode.connect(audioContext.destination);
         webaudio.OnInitialized();
     },
 
