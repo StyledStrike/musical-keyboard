@@ -206,6 +206,33 @@ MKeyboard:RegisterInstrument( "New Age", "sound/musical_keyboard/instruments/new
     volume = 0.5
 } )
 
+MKeyboard:RegisterInstrument( "Music Box", "sound/musical_keyboard/instruments/music_box", {
+    { note = 60, fileName = "C4.ogg" },
+    { note = 72, fileName = "C5.ogg" },
+    { note = 84, fileName = "C6.ogg" },
+    { note = 96, fileName = "C7.ogg" },
+    { note = 108, fileName = "C8.ogg" }
+}, {
+    volume = 0.5,
+    releaseTime = 0.2
+} )
+
+MKeyboard:RegisterInstrument( "Harp", "sound/musical_keyboard/instruments/harp", {
+    { note = 46, fileName = "A^2.ogg" },
+    { note = 56, fileName = "G^3.ogg" },
+    { note = 61, fileName = "C^4.ogg" },
+    { note = 66, fileName = "F^4.ogg" },
+    { note = 73, fileName = "C^5.ogg" },
+    { note = 75, fileName = "D^5.ogg" },
+    { note = 80, fileName = "G^5.ogg" },
+    { note = 85, fileName = "C^6.ogg" },
+    { note = 90, fileName = "F^6.ogg" },
+    { note = 95, fileName = "B6.ogg" }
+}, {
+    volume = 0.55,
+    releaseTime = 0.3
+} )
+
 MKeyboard:RegisterInstrument( "Choir Aahs", "sound/musical_keyboard/instruments/choir_aahs", {
     { note = 51, fileName = "D^3.ogg", loopStart = 1.209750, loopEnd = 2.061156 },
     { note = 54, fileName = "F^3.ogg", loopStart = 0.672531, loopEnd = 2.282875 },
