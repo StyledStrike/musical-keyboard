@@ -48,6 +48,8 @@ function MKeyboard:RegisterLayout( id, name, keys, noteOffset )
     }
 
     if noteOffset then
+        assert( type( noteOffset ) == "number", "'noteOffset' must be a number!" )
+
         for _, key in pairs( layout.keys ) do
             key.note = key.note + noteOffset
         end
