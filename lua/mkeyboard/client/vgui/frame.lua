@@ -162,6 +162,7 @@ function PANEL:Init()
         self:SetKeyboardTranspose( value )
     end )
 
+    self.sliderKeyboardTranspose = sliderKeyboardTranspose
     sliderKeyboardTranspose.PerformLayout = FormSliderLayout
     sliderKeyboardTranspose.Label:SetFont( "MKeyboard_Small" )
 
@@ -437,6 +438,7 @@ function PANEL:SetKeyboardTranspose( transpose )
     Config:Save()
 
     self.pianoPanel:SetButtonLayout( Config.selectedLayoutId, Config.keyboardTranspose )
+    self.sliderKeyboardTranspose:SetValue( transpose )
     self:OnReleaseAllNotes()
 end
 
