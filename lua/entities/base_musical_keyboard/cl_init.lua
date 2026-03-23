@@ -53,9 +53,10 @@ local KEY_OFFSETS = {
 }
 
 local NOTE_COLORS = MKeyboard.NOTE_COLORS
-local NOTE_MIN, NOTE_MAX = 21, 108
+local NOTE_MIN, NOTE_MAX = 33, 120
 
 local Remap = math.Remap
+local DrawBox = render.DrawBox
 local pos, min, max = Vector(), Vector(), Vector()
 
 function ENT:Draw()
@@ -94,7 +95,7 @@ function ENT:Draw()
             min:SetUnpacked( x, -1.5, -1 )
             max:SetUnpacked( x + w, l, h )
 
-            render.DrawBox( self:LocalToWorld( pos ), ang, min, max, NOTE_COLORS[colorIndex] )
+            DrawBox( self:LocalToWorld( pos ), ang, min, max, NOTE_COLORS[colorIndex] )
         end
     end
 end
