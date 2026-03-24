@@ -724,13 +724,14 @@ function PANEL:OpenMIDIChannelsDialog()
 
         if name and name ~= "" then
             Config.midiChannelMapPresets[name] = nil
-            Config.midiSelectedChannelMapPresetName = nil
+            Config.midiSelectedChannelMapPresetName = "#preset.default"
         end
 
         Config:Save()
 
         UpdatePresetList()
         UpdateCombos()
+        UpdateDeleteButton()
     end
 
     local buttonAddPreset = vgui.Create( "DImageButton", panelPresets )
@@ -755,6 +756,7 @@ function PANEL:OpenMIDIChannelsDialog()
 
             UpdatePresetList()
             UpdateCombos()
+            UpdateDeleteButton()
         end )
     end
 
