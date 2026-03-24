@@ -16,7 +16,7 @@ function MKeyboard:Activate( ent )
     self:Deactivate()
 
     if not IsValid( ent ) then
-        -- TODO: error
+        ErrorNoHaltWithStack( "Received an invalid entity when activating the Musical Keyboard!" )
         return
     end
 
