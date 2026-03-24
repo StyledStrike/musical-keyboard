@@ -206,6 +206,42 @@ MKeyboard:RegisterInstrument( "New Age", "sound/musical_keyboard/instruments/new
     volume = 0.5
 } )
 
+MKeyboard:RegisterInstrument( "Soft Synth", "sound/musical_keyboard/instruments/soft_synth", {
+    { note = 36, fileName = "C2.ogg", loopStart = 4.363061, loopEnd = 13.699025 },
+    { note = 48, fileName = "C3.ogg", loopStart = 2.374785, loopEnd = 10.100658 },
+    { note = 60, fileName = "C4.ogg", loopStart = 2.071859, loopEnd = 11.399025 },
+    { note = 72, fileName = "C5.ogg", loopStart = 1.317256, loopEnd = 8.178027 },
+    { note = 84, fileName = "C6.ogg", loopStart = 3.478277, loopEnd = 8.009524 },
+    { note = 96, fileName = "C7.ogg", loopStart = 1.611497, loopEnd = 5.428753 },
+    { note = 108, fileName = "C8.ogg", loopStart = 1.984399, loopEnd = 5.960340 }
+}, {
+    volume = 0.7,
+    releaseTime = 0.3
+} )
+
+MKeyboard:RegisterInstrument( "Polysynth", "sound/musical_keyboard/instruments/polysynth", {
+    { note = 60, fileName = "C4.ogg", loopStart = 5.926327, loopEnd = 10.794785 },
+    { note = 72, fileName = "C5.ogg", loopStart = 2.767959, loopEnd = 8.916122 },
+    { note = 84, fileName = "C6.ogg", loopStart = 1.488141, loopEnd = 5.711837 },
+    { note = 96, fileName = "C7.ogg", loopStart = 1.630204, loopEnd = 4.066236 },
+    { note = 108, fileName = "C8.ogg", loopStart = 0.981066, loopEnd = 2.791406 }
+}, {
+    volume = 0.7,
+    releaseTime = 0.3
+} )
+
+MKeyboard:RegisterInstrument( "Space Voice", "sound/musical_keyboard/instruments/space_voice", {
+    { note = 48, fileName = "C3.ogg", loopStart = 8.013039, loopEnd = 14.327732 },
+    { note = 60, fileName = "C4.ogg", loopStart = 4.014739, loopEnd = 10.326077 },
+    { note = 72, fileName = "C5.ogg", loopStart = 3.592744, loopEnd = 6.742472 },
+    { note = 84, fileName = "C6.ogg", loopStart = 1.792449, loopEnd = 4.148980 },
+    { note = 96, fileName = "C7.ogg", loopStart = 1.215873, loopEnd = 3.039637 },
+    { note = 108, fileName = "C8.ogg", loopStart = 1.059728, loopEnd = 2.577460 }
+}, {
+    volume = 0.7,
+    releaseTime = 0.3
+} )
+
 MKeyboard:RegisterInstrument( "Music Box", "sound/musical_keyboard/instruments/music_box", {
     { note = 60, fileName = "C4.ogg" },
     { note = 72, fileName = "C5.ogg" },
@@ -401,14 +437,16 @@ MKeyboard:RegisterInstrument( "Piccolo", "sound/musical_keyboard/instruments/pic
     releaseTime = 0.2
 } )
 
-MKeyboard:RegisterInstrument( "Soft Synth", "sound/musical_keyboard/instruments/soft_synth", {
-    { note = 36, fileName = "C2.ogg", loopStart = 4.363061, loopEnd = 13.699025 },
-    { note = 48, fileName = "C3.ogg", loopStart = 2.374785, loopEnd = 10.100658 },
-    { note = 60, fileName = "C4.ogg", loopStart = 2.071859, loopEnd = 11.399025 },
-    { note = 72, fileName = "C5.ogg", loopStart = 1.317256, loopEnd = 8.178027 },
-    { note = 84, fileName = "C6.ogg", loopStart = 3.478277, loopEnd = 8.009524 },
-    { note = 96, fileName = "C7.ogg", loopStart = 1.611497, loopEnd = 5.428753 },
-    { note = 108, fileName = "C8.ogg", loopStart = 1.984399, loopEnd = 5.960340 }
+MKeyboard:RegisterInstrument( "Pizzicato Strings", "sound/musical_keyboard/instruments/pizzicato_strings", {
+    { note = 48, fileName = "C3.ogg" },
+    { note = 55, fileName = "G3.ogg" },
+    { note = 60, fileName = "C4.ogg" },
+    { note = 67, fileName = "G4.ogg" },
+    { note = 72, fileName = "C5.ogg" },
+    { note = 79, fileName = "G5.ogg" },
+    { note = 84, fileName = "C6.ogg" },
+    { note = 91, fileName = "G6.ogg" },
+    { note = 96, fileName = "C7.ogg" }
 }, {
     volume = 0.7,
     releaseTime = 0.3
