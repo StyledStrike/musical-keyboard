@@ -423,6 +423,21 @@ MKeyboard:RegisterInstrument( "Vibraphone", "sound/musical_keyboard/instruments/
     releaseTime = 0.3
 } )
 
+MKeyboard:RegisterInstrument( "Flute", "sound/musical_keyboard/instruments/flute", {
+    { note = 61, fileName = "C^4.ogg", loopStart = 0.659501, loopEnd = 0.911383 },
+    { note = 64, fileName = "E4.ogg", loopStart = 0.725465, loopEnd = 0.975261 },
+    { note = 67, fileName = "G4.ogg", loopStart = 0.644240, loopEnd = 0.870771 },
+    { note = 71, fileName = "B4.ogg", loopStart = 0.380726, loopEnd = 0.615351 },
+    { note = 74, fileName = "D5.ogg", loopStart = 1.015941, loopEnd = 1.253900 },
+    { note = 78, fileName = "F^5.ogg", loopStart = 0.440703, loopEnd = 0.679184 },
+    { note = 80, fileName = "G^5.ogg", loopStart = 0.255578, loopEnd = 0.499229 },
+    { note = 84, fileName = "C6.ogg", loopStart = 0.510862, loopEnd = 0.737256 },
+    { note = 90, fileName = "F^6.ogg", loopStart = 0.425556, loopEnd = 0.679184 }
+}, {
+    volume = 0.5,
+    releaseTime = 0.1
+} )
+
 MKeyboard:RegisterInstrument( "Piccolo", "sound/musical_keyboard/instruments/piccolo", {
     { note = 88, fileName = "E6.ogg", loopStart = 0.519138, loopEnd = 0.75466 },
     { note = 90, fileName = "F^6.ogg", loopStart = 0.558980, loopEnd = 0.806893 },
@@ -435,6 +450,47 @@ MKeyboard:RegisterInstrument( "Piccolo", "sound/musical_keyboard/instruments/pic
 }, {
     volume = 0.4,
     releaseTime = 0.2
+} )
+
+MKeyboard:RegisterInstrument( "French Horn", "sound/musical_keyboard/instruments/french_horn", {
+    { note = 34, fileName = "A^1.ogg", loopStart = 1.436137, loopEnd = 2.963280 },
+    { note = 38, fileName = "D2.ogg", loopStart = 1.046296, loopEnd = 2.649723 },
+    { note = 42, fileName = "F^2.ogg", loopStart = 0.892577, loopEnd = 2.618907 },
+    { note = 46, fileName = "A^2.ogg", loopStart = 1.085568, loopEnd = 2.588064 },
+    { note = 50, fileName = "D3.ogg", loopStart = 1.094784, loopEnd = 2.555296 },
+    { note = 58, fileName = "A^3.ogg", loopStart = 1.027072, loopEnd = 2.488256 },
+    { note = 62, fileName = "D4.ogg", loopStart = 1.238487, loopEnd = 2.757366 },
+    { note = 74, fileName = "D5.ogg", loopStart = 1.706853, loopEnd = 3.027762 }
+}, {
+    volume = 0.4,
+    releaseTime = 0.3
+} )
+
+MKeyboard:RegisterInstrument( "Strings", "sound/musical_keyboard/instruments/strings", {
+    { note = 28, fileName = "E1.ogg", loopStart = 0.704354, loopEnd = 2.637143 },
+    { note = 30, fileName = "F^1.ogg", loopStart = 0.986417, loopEnd = 2.922630 },
+    { note = 33, fileName = "A1.ogg", loopStart = 0.658322, loopEnd = 2.711383 },
+    { note = 36, fileName = "C2.ogg", loopStart = 0.606417, loopEnd = 2.984830 },
+    { note = 39, fileName = "D^2.ogg", loopStart = 0.436803, loopEnd = 1.896032 },
+    { note = 43, fileName = "G2.ogg", loopStart = 0.635556, loopEnd = 2.198209 },
+    { note = 46, fileName = "A^2.ogg", loopStart = 0.694331, loopEnd = 2.918934 },
+    { note = 48, fileName = "C3.ogg", loopStart = 0.512948, loopEnd = 2.511451 },
+    { note = 52, fileName = "E3.ogg", loopStart = 0.425510, loopEnd = 2.167528 },
+    { note = 55, fileName = "G3.ogg", loopStart = 0.601927, loopEnd = 2.471791 },
+    { note = 59, fileName = "B3.ogg", loopStart = 0.645918, loopEnd = 2.967029 },
+    { note = 62, fileName = "D4.ogg", loopStart = 0.706304, loopEnd = 2.478231 },
+    { note = 65, fileName = "F4.ogg", loopStart = 0.395465, loopEnd = 2.124626 },
+    { note = 68, fileName = "G^4.ogg", loopStart = 0.551361, loopEnd = 2.351859 },
+    { note = 70, fileName = "A^4.ogg", loopStart = 0.440249, loopEnd = 2.093878 },
+    { note = 75, fileName = "D^5.ogg", loopStart = 0.378889, loopEnd = 2.255465 },
+    { note = 79, fileName = "G5.ogg", loopStart = 0.254399, loopEnd = 1.610590 },
+    { note = 82, fileName = "A^5.ogg", loopStart = 0.379070, loopEnd = 1.777642 },
+    { note = 88, fileName = "E6.ogg", loopStart = 0.364467, loopEnd = 1.851020 },
+    { note = 91, fileName = "G6.ogg", loopStart = 0.506916, loopEnd = 1.957937 },
+    { note = 93, fileName = "A6.ogg", loopStart = 0.335964, loopEnd = 1.659206 }
+}, {
+    volume = 0.7,
+    releaseTime = 0.3
 } )
 
 MKeyboard:RegisterInstrument( "Pizzicato Strings", "sound/musical_keyboard/instruments/pizzicato_strings", {
