@@ -19,6 +19,7 @@ function PANEL:Init()
 
     self.layoutName = nil
     self.instrumentName = nil
+    self.lastCursorNote = nil
 
     self.padding = ScaleSize( 8 )
     self.headerHeight = ScaleSize( 28 )
@@ -167,6 +168,27 @@ local function IsInRange( note, range )
     return note >= range.min and note <= range.max
 end
 
+local cursor = {
+    x = 0,
+    y = 0,
+
+    hoveredNote = nil,
+    hoverX = 0,
+    hoverY = 0,
+    hoverW = 0,
+    hoverH = 0
+}
+
+local function TestCursorInKey( note, boxX, boxY, boxW, boxH )
+    if cursor.x > boxX and cursor.y > boxY and cursor.x < boxX + boxW and cursor.y < boxY + boxH then
+        cursor.hoveredNote = note
+        cursor.hoverX = boxX
+        cursor.hoverY = boxY
+        cursor.hoverW = boxW
+        cursor.hoverH = boxH
+    end
+end
+
 local SetDrawColor = surface.SetDrawColor
 local SetScissorRect = render.SetScissorRect
 local MidiNoteIterator = MKeyboard.MidiNoteIterator
@@ -175,6 +197,9 @@ local NOTE_COLORS = MKeyboard.NOTE_COLORS
 
 function PANEL:PaintPianoRoll( x, y, h )
     local pianoW = self.pianoRollW
+    
+    cursor.x, cursor.y = self:ScreenToLocal( input.GetCursorPos() )
+    cursor.hoveredNote = nil
 
     local clipX, clipY = self:LocalToScreen( x, y )
     SetScissorRect( clipX, clipY, clipX + pianoW, clipY + h, true )
@@ -203,6 +228,8 @@ function PANEL:PaintPianoRoll( x, y, h )
     startNote = whiteKeyNotes[startNote]
     endNote = whiteKeyNotes[endNote]
 
+    local boxX, boxY, boxW, boxH
+
     for note in MidiNoteIterator( false, startNote, endNote ) do
         key = allKeys[note]
         inEnabledRange = IsInRange( note, enabledRange )
@@ -217,11 +244,13 @@ function PANEL:PaintPianoRoll( x, y, h )
             SetDrawColor( 120, 120, 120, 255 )
         end
 
-        DrawRect( x + key.x, y, keyWidth - 1, h )
+        boxX, boxY, boxW, boxH = x + key.x, y, keyWidth - 1, h
+        DrawRect( boxX, boxY, boxW, boxH )
+        TestCursorInKey( note, boxX, boxY, boxW, boxH )
 
         if key.isCKey then
             SetDrawColor( colors.accent )
-            DrawRect( x + key.x, y + h - cMarkerH, keyWidth - 1, cMarkerH )
+            DrawRect( boxX, y + h - cMarkerH, boxW, cMarkerH )
         end
 
         if drawButtonLabels and noteButtons[note] then
@@ -234,6 +263,7 @@ function PANEL:PaintPianoRoll( x, y, h )
     end
 
     local blackKeyW = keyWidth * 0.7
+    local blackHeyH = h * 0.6
 
     for note in MidiNoteIterator( true, startNote, endNote ) do
         key = allKeys[note]
@@ -249,7 +279,10 @@ function PANEL:PaintPianoRoll( x, y, h )
             SetDrawColor( 80, 80, 80, 255 )
         end
 
-        DrawRect( x + key.x, y, blackKeyW, h * 0.6 )
+        boxX, boxY, boxW, boxH = x + key.x, y, blackKeyW, blackHeyH
+
+        DrawRect( boxX, boxY, boxW, boxH )
+        TestCursorInKey( note, boxX, boxY, boxW, boxH )
 
         if drawButtonLabels and noteButtons[note] then
             DrawSimpleText( noteButtons[note], "MKeyboard_Small", x + key.x + blackKeyW * 0.5, y + h * 0.55, colors.labelText, 1, 4 )
@@ -257,6 +290,31 @@ function PANEL:PaintPianoRoll( x, y, h )
 
         if drawButtonLabels and noteAltButtons[note] then
             DrawSimpleText( noteAltButtons[note], "MKeyboard_Small", x + key.x + blackKeyW * 0.5, y + h * 0.35, colors.labelText, 1, 4 )
+        end
+    end
+
+    local cursorNote = nil
+
+    if cursor.hoveredNote then
+        if input.IsButtonDown( 107 ) then -- MOUSE_LEFT
+            cursorNote = cursor.hoveredNote
+        else
+            SetDrawColor( 0, 0, 0, 100 )
+            DrawRect( cursor.hoverX, cursor.hoverY, cursor.hoverW, cursor.hoverH )
+        end
+    end
+
+    if self.lastCursorNote ~= cursorNote then
+        local parent = self:GetParent()
+
+        if self.lastCursorNote and parent.ReleaseNote then
+            parent:ReleaseNote( 1, self.lastCursorNote )
+        end
+
+        self.lastCursorNote = cursorNote
+
+        if cursorNote then
+            parent:PressNote( 1, cursorNote, 127, nil, false  )
         end
     end
 
