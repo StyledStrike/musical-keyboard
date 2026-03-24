@@ -129,7 +129,6 @@ function MKeyboard:GetImpulseResponseByName( name )
     end
 end
 
-MKeyboard:RegisterImpulseResponse( "#mkeyboard.ir.cavern", "cavern.wav" )
 MKeyboard:RegisterImpulseResponse( "#mkeyboard.ir.church", "church.wav" )
 MKeyboard:RegisterImpulseResponse( "#mkeyboard.ir.cinema_room", "cinema_room.wav" )
 MKeyboard:RegisterImpulseResponse( "#mkeyboard.ir.hall_large", "hall_large.wav" )
