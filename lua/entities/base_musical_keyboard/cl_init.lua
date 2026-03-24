@@ -53,7 +53,7 @@ local KEY_OFFSETS = {
 }
 
 local NOTE_COLORS = MKeyboard.NOTE_COLORS
-local NOTE_MIN, NOTE_MAX = 33, 120
+local NOTE_MIN, NOTE_MAX = 21, 108
 
 local Remap = math.Remap
 local DrawBox = render.DrawBox

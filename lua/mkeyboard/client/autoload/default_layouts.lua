@@ -86,7 +86,7 @@ MKeyboard:RegisterLayout( "expanded", "#musicalk.layout.expanded", {
     { button = KEY_B, note = 94, requiresShift = true },
     { button = KEY_N, note = 95 },
     { button = KEY_M, note = 96 }
-}, 12 )
+} )
 
 -- Keyboard layout from FL Studio
 MKeyboard:RegisterLayout( "fl_studio", "FL Studio", {
@@ -123,4 +123,4 @@ MKeyboard:RegisterLayout( "fl_studio", "FL Studio", {
     { button = KEY_LBRACKET, note = 53 },
     { button = KEY_EQUAL, note = 54 },
     { button = KEY_RBRACKET, note = 55 }
-}, 24 )
+}, 12 )
