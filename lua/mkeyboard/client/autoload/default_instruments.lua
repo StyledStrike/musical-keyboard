@@ -540,6 +540,7 @@ local function AddInstrumentWithNoteRange( name, basePath, startNote, endNote, e
 end
 
 AddInstrumentWithNoteRange( "Standard Drums", "sound/musical_keyboard/instruments/drums_standard", 26, 87, ".mp3", {
-    volume = 0.4
+    volume = 0.4,
+    releaseTime = 0.5
 } )
 
