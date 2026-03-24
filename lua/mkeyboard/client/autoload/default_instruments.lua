@@ -291,6 +291,73 @@ MKeyboard:RegisterInstrument( "Nylon Guitar", "sound/musical_keyboard/instrument
     releaseTime = 0.2
 } )
 
+MKeyboard:RegisterInstrument( "Jazz Guitar", "sound/musical_keyboard/instruments/jazz_guitar", {
+    { note = 52, fileName = "E3.ogg" },
+    { note = 57, fileName = "A3.ogg" },
+    { note = 62, fileName = "D4.ogg" },
+    { note = 65, fileName = "F4.ogg" },
+    { note = 70, fileName = "A^4.ogg" },
+    { note = 73, fileName = "C^5.ogg" },
+    { note = 76, fileName = "E5.ogg" },
+    { note = 79, fileName = "G5.ogg" },
+    { note = 82, fileName = "A^5.ogg" },
+    { note = 85, fileName = "C^6.ogg" },
+    { note = 89, fileName = "F6.ogg" },
+    { note = 91, fileName = "G6.ogg" },
+    { note = 94, fileName = "A^6.ogg" }
+}, {
+    volume = 0.9,
+    releaseTime = 0.15
+} )
+
+MKeyboard:RegisterInstrument( "Picked Bass", "sound/musical_keyboard/instruments/picked_bass", {
+    { note = 35, fileName = "B1.ogg", loopStart = 1.951429, loopEnd = 1.983900 },
+    { note = 36, fileName = "C2.ogg", loopStart = 1.962971, loopEnd = 1.993628 },
+    { note = 38, fileName = "D2.ogg", loopStart = 1.972381, loopEnd = 1.999637 },
+    { note = 40, fileName = "E2.ogg", loopStart = 1.971814, loopEnd = 1.996100 },
+    { note = 41, fileName = "F2.ogg", loopStart = 1.982268, loopEnd = 2.005215 },
+    { note = 43, fileName = "G2.ogg", loopStart = 1.969796, loopEnd = 1.990295 },
+    { note = 45, fileName = "A2.ogg", loopStart = 1.958141, loopEnd = 1.994490 },
+    { note = 47, fileName = "B2.ogg", loopStart = 1.961383, loopEnd = 1.993764 },
+    { note = 48, fileName = "C3.ogg", loopStart = 1.957415, loopEnd = 1.988005 },
+    { note = 50, fileName = "D3.ogg", loopStart = 1.968526, loopEnd = 1.995782 },
+    { note = 52, fileName = "E3.ogg", loopStart = 1.980385, loopEnd = 2.004649 },
+    { note = 53, fileName = "F3.ogg", loopStart = 1.983560, loopEnd = 2.006485 },
+    { note = 55, fileName = "G3.ogg", loopStart = 1.977800, loopEnd = 1.998209 },
+    { note = 57, fileName = "A3.ogg", loopStart = 1.984830, loopEnd = 2.003016 },
+    { note = 59, fileName = "B3.ogg", loopStart = 1.990159, loopEnd = 2.006372 },
+    { note = 60, fileName = "C4.ogg", loopStart = 1.986984, loopEnd = 2.002290 },
+    { note = 62, fileName = "D4.ogg", loopStart = 1.988367, loopEnd = 2.002018 },
+    { note = 64, fileName = "E4.ogg", loopStart = 1.992925, loopEnd = 2.005079 },
+    { note = 65, fileName = "F4.ogg", loopStart = 1.994807, loopEnd = 2.006236 },
+    { note = 67, fileName = "G4.ogg", loopStart = 1.995374, loopEnd = 2.005578 },
+    { note = 69, fileName = "A4.ogg", loopStart = 1.998594, loopEnd = 2.007687 },
+    { note = 71, fileName = "B4.ogg", loopStart = 1.996077, loopEnd = 2.004172 },
+    { note = 72, fileName = "C5.ogg", loopStart = 1.996281, loopEnd = 2.003946 },
+    { note = 74, fileName = "D5.ogg", loopStart = 1.992132, loopEnd = 2.005782 },
+    { note = 76, fileName = "E5.ogg", loopStart = 1.994717, loopEnd = 2.006848 },
+    { note = 77, fileName = "F5.ogg", loopStart = 1.996689, loopEnd = 2.002404 }
+}, {
+    volume = 0.8,
+    releaseTime = 0.15
+} )
+
+MKeyboard:RegisterInstrument( "Slap Bass", "sound/musical_keyboard/instruments/slap_bass", {
+    { note = 40, fileName = "E2.ogg", loopStart = 6.076780, loopEnd = 6.101043 },
+    { note = 41, fileName = "F2.ogg", loopStart = 5.304490, loopEnd = 5.327528 },
+    { note = 45, fileName = "A2.ogg", loopStart = 6.345624, loopEnd = 6.363719 },
+    { note = 47, fileName = "B2.ogg", loopStart = 1.042608, loopEnd = 1.407710 },
+    { note = 50, fileName = "D3.ogg", loopStart = 5.598934, loopEnd = 5.967460 },
+    { note = 55, fileName = "G3.ogg", loopStart = 5.833855, loopEnd = 5.844172 },
+    { note = 59, fileName = "B3.ogg", loopStart = 2.633197, loopEnd = 2.641270 },
+    { note = 62, fileName = "D4.ogg", loopStart = 3.432653, loopEnd = 3.439456 },
+    { note = 65, fileName = "F4.ogg", loopStart = 4.220159, loopEnd = 4.225941 },
+    { note = 68, fileName = "G^4.ogg", loopStart = 0.775941, loopEnd = 0.780771 }
+}, {
+    volume = 0.8,
+    releaseTime = 0.15
+} )
+
 MKeyboard:RegisterInstrument( "Soft Synth", "sound/musical_keyboard/instruments/soft_synth", {
     { note = 36, fileName = "C2.ogg", loopStart = 4.363061, loopEnd = 13.699025 },
     { note = 48, fileName = "C3.ogg", loopStart = 2.374785, loopEnd = 10.100658 },
