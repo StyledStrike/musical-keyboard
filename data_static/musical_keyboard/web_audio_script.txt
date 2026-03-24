@@ -689,6 +689,8 @@ class Source extends DestroyableObject {
 
         const gainNode = audioContext.createGain();
         gainNode.gain.value = gain;
+        gainNode.channelCount = 2;
+        gainNode.channelCountMode = "explicit";
 
         const sourceNode = audioContext.createBufferSource();
         sourceNode.buffer = sample.audioBuffer;
