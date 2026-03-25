@@ -766,6 +766,7 @@ function PANEL:OpenMIDIChannelsDialog()
 
     StyledTheme.Apply( scrollChannels )
 
+    local FrameTime = FrameTime
     local channelState = MKeyboard.MIDI.channelState
     local automatedColor = MKeyboard.NOTE_COLORS.automated
     local channelAlpha = {}
@@ -778,7 +779,7 @@ function PANEL:OpenMIDIChannelsDialog()
         DrawRect( 4, 4, 8, h - 8 )
 
         local channelIndex = s._channelIndex
-        channelAlpha[channelIndex] = Lerp( FrameTime() * 10, channelAlpha[channelIndex], channelState[channelIndex] and 1 or 0 )
+        channelAlpha[channelIndex] = channelState[channelIndex] and 1 or Lerp( FrameTime() * 30, channelAlpha[channelIndex], 0 )
 
         SetColor( automatedColor.r, automatedColor.g, automatedColor.b, 255 * channelAlpha[channelIndex] )
         DrawRect( 4, 4, 8, h - 8 )

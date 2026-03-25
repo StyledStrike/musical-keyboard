@@ -152,6 +152,8 @@ function MIDI:CheckDevices()
     end
 end
 
+local channelState = MIDI.channelState
+
 hook.Add( "MIDI", "MKeyboard.CaptureMIDIEvents", function( _, code, p1, p2 )
     local frame = MKeyboard.frame
     if not IsValid( frame ) then return end
@@ -167,12 +169,14 @@ hook.Add( "MIDI", "MKeyboard.CaptureMIDIEvents", function( _, code, p1, p2 )
         local note = p1 + Config.midiTranspose
         local velocity = math.floor( p2 )
 
+        channelState[channel] = note
         frame:PressNote( channel, note, velocity, instrumentIndex, true )
 
     elseif cmd == "NOTE_OFF" then
         local channel = midi.GetCommandChannel( code )
         local note = p1 + Config.midiTranspose
 
+        channelState[channel] = nil
         frame:ReleaseNote( channel, note )
     end
 end )
