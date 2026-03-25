@@ -296,7 +296,7 @@ function PANEL:PaintPianoRoll( x, y, h )
     local cursorNote = nil
 
     if cursor.hoveredNote then
-        if input.IsButtonDown( 107 ) then -- MOUSE_LEFT
+        if vgui.CursorVisible() and input.IsButtonDown( 107 ) then -- MOUSE_LEFT
             cursorNote = cursor.hoveredNote
         else
             SetDrawColor( 0, 0, 0, 100 )

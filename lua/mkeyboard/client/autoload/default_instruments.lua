@@ -374,7 +374,7 @@ MKeyboard:RegisterInstrument( "Picked Bass", "sound/musical_keyboard/instruments
 { note = 64, fileName = "E4.ogg", loopStart = 1.994717, loopEnd = 2.006848 },
 { note = 65, fileName = "F4.ogg", loopStart = 1.996689, loopEnd = 2.002404 }
 }, {
-    volume = 0.6,
+    volume = 0.5,
     releaseTime = 0.15
 } )
 
