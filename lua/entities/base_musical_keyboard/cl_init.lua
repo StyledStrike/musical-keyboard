@@ -13,11 +13,47 @@ function ENT:OnRemove( fullUpdate )
     end
 end
 
+local CurTime = CurTime
+local EntityPlayNote = MKeyboard.EntityPlayNote
+local EntityStopNote = MKeyboard.EntityStopNote
+
+local function ProcessPlaybackQueue( ent, rangedEmitter )
+    -- For proper timing, we offset the playback time by
+    -- two times the buffer transmission interval.
+    -- (Look for the `MKeyboard.TransmitNotes` timer on mkeyboard/client/events.lua)
+    local t = CurTime() - MKeyboard.TRANSMIT_BUFFER_INTERVAL * 2
+
+    -- Process note start/stop events according to ther timestamp.
+    local reproduceEvents = rangedEmitter.reproduceEvents
+
+    -- We must process the note press events first, since the note release
+    -- event for the same channel/note might come in the same tick.
+    for id, event in pairs( reproduceEvents ) do
+        if t >= event.time and event.instrumentIndex then
+            reproduceEvents[id] = nil
+            EntityPlayNote( ent, event.channelIndex, event.note, event.velocity, event.instrumentIndex, event.isAutomated )
+        end
+    end
+
+    for id, event in pairs( reproduceEvents ) do
+        if t >= event.time and not event.instrumentIndex then
+            reproduceEvents[id] = nil
+            EntityStopNote( ent, event.channelIndex, event.note )
+        end
+    end
+end
+
 function ENT:Think()
     self:SetNextClientThink( CurTime() )
 
-    if self.rangedEmitter then
-        self.rangedEmitter:Think()
+    local rangedEmitter = self.rangedEmitter
+
+    if rangedEmitter then
+        rangedEmitter:Think()
+
+        if rangedEmitter.reproduceEvents then
+            ProcessPlaybackQueue( self, rangedEmitter )
+        end
     end
 
     return true

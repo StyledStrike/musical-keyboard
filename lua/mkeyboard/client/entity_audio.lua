@@ -29,16 +29,21 @@ function RangedEmitter:Activate()
     self.channels = {}
     self.activeNotes = {}
 
-    if self.emitter then return end
+    -- Store the events that we receive from the server to reproduce later
+    self.reproduceEvents = {}
+    self.reproduceLastId = 0
 
-    self.emitter = MKeyboard.WebAudio.CreateEmitter()
-    self.emitter:SetMaxDistance( MAX_PROCESSING_DISTANCE )
+    if not self.emitter then
+        self.emitter = MKeyboard.WebAudio.CreateEmitter()
+        self.emitter:SetMaxDistance( MAX_PROCESSING_DISTANCE )
+    end
 
     local ent = self.ent
-    self.emitter:SetHRTFEnabled( ent:GetHRTFEnabled() )
 
+    -- Get emitter effect parameters from the entity
     local ir = MKeyboard.impulseResponses[ent:GetImpulseResponseIndex()]
     self.emitter:SetImpulseResponseAudioFile( ir ~= nil and ir.fileName )
+    self.emitter:SetHRTFEnabled( ent:GetHRTFEnabled() )
 end
 
 function RangedEmitter:Deactivate()
@@ -51,6 +56,8 @@ function RangedEmitter:Deactivate()
     self.emitter = nil
     self.channels = nil
     self.activeNotes = nil
+    self.reproduceEvents = nil
+    self.reproduceLastId = nil
 end
 
 do
@@ -177,6 +184,8 @@ function MKeyboard.EntityPlayNote( ent, channelIndex, note, velocity, instrument
 
     local instrument = UseInstrument( instrumentIndex )
     if not instrument then return end
+
+    -- TODO: Add a limit to how many notes can play simultaneously
 
     local sample, pitch = GetSampleFromNote( instrument, note )
     local sampleId = SAMPLE_ID_FORMAT:format( instrumentIndex, sample.fileName )

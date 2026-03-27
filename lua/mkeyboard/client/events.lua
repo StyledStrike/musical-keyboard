@@ -47,23 +47,71 @@ function MKeyboard:Activate( ent )
         end )
     end
 
-    -- Passthrough local note press/release events to our entity
+    -- Keep track of all the note press/release events
+    -- that happened since the last time we sent them to the server.
+    local transmitBuffer = {}
+    local transmitCount = 0
+
     self.frame.OnNotePressed = function( _, channelIndex, note, velocity, instrumentIndex, isAutomated )
+        -- Passthrough local note press events to our local entity
         if IsValid( self.entity ) then
             self.EntityPlayNote( self.entity, channelIndex, note, velocity, instrumentIndex, isAutomated )
         end
+
+        -- Do not add more note press events when the buffer is full
+        if transmitCount >= MKeyboard.MAX_NOTE_EVENTS then return end
+
+        local event = {
+            time = CurTime(), -- The time when the note was pressed
+            note = note,
+            velocity = velocity,
+            channelIndex = channelIndex,
+            instrumentIndex = instrumentIndex,
+            isAutomated = isAutomated
+        }
+
+        transmitCount = transmitCount + 1
+        transmitBuffer[transmitCount] = event
     end
 
     self.frame.OnNoteReleased = function( _, channelIndex, note )
+        -- Passthrough local note release events to our local entity
         if IsValid( self.entity ) then
             self.EntityStopNote( self.entity, channelIndex, note )
         end
+
+        -- Remove all note press events if the buffer is full
+        if transmitCount >= MKeyboard.MAX_NOTE_EVENTS then
+            local event
+
+            for i = transmitCount, 1, -1 do
+                event = transmitBuffer[i]
+
+                if event.instrumentIndex then
+                    table.remove( transmitBuffer, i )
+                end
+            end
+
+            transmitCount = #transmitBuffer
+        end
+
+        local event = {
+            time = CurTime(), -- The time when the note was released
+            note = note,
+            channelIndex = channelIndex
+        }
+
+        transmitCount = transmitCount + 1
+        transmitBuffer[transmitCount] = event
     end
 
     self.frame.OnReleaseAllNotes = function()
         if IsValid( self.entity ) then
             self.EntityReleaseAllNotes( self.entity )
         end
+
+        transmitCount = 0
+        table.Empty( transmitBuffer )
     end
 
     -- Passthrough button events while the frame is focused
@@ -74,6 +122,21 @@ function MKeyboard:Activate( ent )
     self.frame.OnKeyCodeReleased = function( _, key )
         self:OnButtonRelease( key )
     end
+
+    timer.Create( "MKeyboard.TransmitNotes", MKeyboard.TRANSMIT_BUFFER_INTERVAL, 0, function()
+        if transmitCount < 1 then return end
+
+        local entity = self.entity
+        if not IsValid( entity ) then return end
+
+        net.Start( "mkeyboard.notes", false )
+        net.WriteEntity( entity )
+        MKeyboard.WriteEvents( transmitBuffer )
+        net.SendToServer()
+
+        transmitCount = 0
+        table.Empty( transmitBuffer )
+    end )
 
     hook.Add( "Think", "MKeyboard.ProcessLocalKeyboard", function()
         if not IsValid( self.entity ) then
@@ -138,7 +201,8 @@ function MKeyboard:Deactivate()
     end
 
     if IsValid( self.entity ) then
-        self.EntityDestroyAllNotes( self.entity )
+        self.EntityReleaseAllNotes( self.entity )
+        --self.EntityDestroyAllNotes( self.entity )
     end
 
     self.frame = nil
@@ -155,6 +219,7 @@ function MKeyboard:Deactivate()
     hook.Remove( "StartChat", "MKeyboard.PreventOpeningChat" )
 
     timer.Remove( "MKeyboard.MIDI.CheckDevices" )
+    timer.Remove( "MKeyboard.TransmitNotes" )
 
     if self.MIDI then
         self.MIDI:Close()
@@ -226,6 +291,10 @@ local SHORTCUT_KEYS = {
 function MKeyboard:OnButtonRelease( button )
     if not IsValid( self.frame ) then return end
 
+    if self.blockInputTimeout and RealTime() < self.blockInputTimeout then
+        return
+    end
+
     if SHORTCUT_KEYS[button] then
         SHORTCUT_KEYS[button]( self.frame )
 
@@ -234,3 +303,26 @@ function MKeyboard:OnButtonRelease( button )
 
     self.frame:OnKeyboardReleaseButton( button )
 end
+
+net.Receive( "mkeyboard.notes", function()
+    local ent = net.ReadEntity()
+    if not IsValid( ent ) then return end
+
+    local rangedEmitter = ent.rangedEmitter
+    if not rangedEmitter then return end
+
+    local reproduceEvents = rangedEmitter.reproduceEvents
+    if not reproduceEvents then return end
+
+    local events = MKeyboard.ReadEvents()
+
+    -- Queue events to be reproduced
+    local id = rangedEmitter.reproduceLastId
+
+    for _, event in ipairs( events ) do
+        id = id + 1
+        reproduceEvents[id] = event
+    end
+
+    rangedEmitter.reproduceLastId = id
+end )
