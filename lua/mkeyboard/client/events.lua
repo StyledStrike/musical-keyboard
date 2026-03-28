@@ -200,11 +200,6 @@ function MKeyboard:Deactivate()
         self.frame:Close()
     end
 
-    if IsValid( self.entity ) then
-        self.EntityReleaseAllNotes( self.entity )
-        --self.EntityDestroyAllNotes( self.entity )
-    end
-
     self.frame = nil
     self.entity = nil
 
@@ -315,6 +310,13 @@ net.Receive( "mkeyboard.notes", function()
     if not reproduceEvents then return end
 
     local events = MKeyboard.ReadEvents()
+
+    -- An empty buffer means "stop all notes".
+    if #events < 1 then
+        table.Empty( reproduceEvents )
+        MKeyboard.EntityReleaseAllNotes( ent )
+        return
+    end
 
     -- Queue events to be reproduced
     local id = rangedEmitter.reproduceLastId

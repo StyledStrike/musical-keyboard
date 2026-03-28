@@ -59,6 +59,15 @@ function ENT:RemovePlayer()
     end
 
     self.activePlayer = nil
+
+    local targets = MKeyboard.GetNearbyPlayers( self:GetPos() )
+    if #targets < 0 then return end
+
+    -- Send a empty note events buffer, which stops all notes.
+    net.Start( "mkeyboard.notes", false )
+    net.WriteEntity( self )
+    MKeyboard.WriteEvents( {} )
+    net.Send( targets )
 end
 
 function ENT:Think()

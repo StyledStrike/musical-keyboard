@@ -17,6 +17,8 @@ local function GetNearbyPlayers( pos, ignorePly )
     return targets
 end
 
+MKeyboard.GetNearbyPlayers = GetNearbyPlayers
+
 net.Receive( "mkeyboard.notes", function( _, ply )
     local entity = net.ReadEntity()
 
