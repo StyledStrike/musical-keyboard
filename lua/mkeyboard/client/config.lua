@@ -8,6 +8,7 @@ function Config:Reset()
 
     -- Interface options
     self.drawButtonLabels = true
+    self.sortSheetsAlphabetically = false
 
     -- Options for playing with a PC keyboard
     self.keyboardVelocity = 127
@@ -39,6 +40,7 @@ function Config:Save( immediate )
         selectedSheetIndex = self.selectedSheetIndex,
 
         drawButtonLabels = self.drawButtonLabels,
+        sortSheetsAlphabetically = self.sortSheetsAlphabetically,
 
         keyboardVelocity = self.keyboardVelocity,
         keyboardTranspose = self.keyboardTranspose,
@@ -78,6 +80,7 @@ function Config:Load()
         0, #MKeyboard.sheets, self.selectedSheetIndex )
 
     LoadBool( "drawButtonLabels", self.drawButtonLabels )
+    LoadBool( "sortSheetsAlphabetically", self.sortSheetsAlphabetically )
 
     SetNumber( self, "keyboardVelocity", data.keyboardVelocity, 1, 127, self.keyboardVelocity )
     SetNumber( self, "keyboardTranspose", data.keyboardTranspose, -48, 48, self.keyboardTranspose )

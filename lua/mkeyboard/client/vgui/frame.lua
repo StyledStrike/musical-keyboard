@@ -175,6 +175,17 @@ function PANEL:Init()
     toggleLabels:SetTall( ROW_HEIGHT )
     toggleLabels:SetFont( "MKeyboard_Small" )
 
+    -- Should sheets be sorted alphabetically?
+    local toggleSortSheets = StyledTheme.CreateFormToggle( settingsScroll, "#musicalk.vkeys.sorting", Config.sortSheetsAlphabetically, function( value )
+        Config.sortSheetsAlphabetically = value
+        Config:Save()
+
+        self:UpdateSheetsList()
+    end )
+
+    toggleSortSheets:SetTall( ROW_HEIGHT )
+    toggleSortSheets:SetFont( "MKeyboard_Small" )
+
     -- MIDI settings
     AddSeparator( "MIDI" )
 
@@ -328,8 +339,9 @@ function PANEL:UpdateSheetsList()
     noneLine.Columns[1].UpdateColours = ListLineUpdateColors
 
     local selectedLine = noneLine
+    local iterator = Config.sortSheetsAlphabetically and SortedPairsByMemberValue or ipairs
 
-    for index, sheet in ipairs( MKeyboard.sheets ) do
+    for index, sheet in iterator( MKeyboard.sheets, "title" ) do
         if sheet.layoutId == layoutId then
             local line = self.sheetsList:AddLine( sheet.title )
             line._sheetIndex = index
