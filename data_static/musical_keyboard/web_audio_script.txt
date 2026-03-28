@@ -1,0 +1,764 @@
+/*
+    This code was placed on a separate file to get
+    better autocomplete/JSDoc support on my editor.
+
+    It is not loaded by Lua directly, instead this code
+    should be minified (with something like Terser via minify-js.com)
+    and stored as a Lua string on `lua/mkeyboard/client/webaudio.lua`
+*/
+
+const audioContext = new AudioContext();
+
+if (!audioContext) {
+    webaudio.OnInitFailed( "no_audio_context" );
+    throw new Error(`Failed to create AudioContext!`);
+}
+
+if (audioContext.state == "suspended") {
+    audioContext.resume()
+        .then(() => { console.log("AudioContext resumed") })
+        .catch((err) => { console.log("AudioContext failed to resume: " + err) });
+}
+
+/*
+    Glue logic for Lua.
+    Handles the "master" audio graph, listener updates,
+    and manages the `Sample` and `Emitter` lifecycle.
+*/
+
+const manager = {
+    /**
+     * Loaded samples. ID string as the key, `Sample` instance as the value.
+     * @type { Record<string, Sample> }
+     */
+    samples: {},
+
+    /**
+     * Active emitters. ID string as the key, `Emitter` instance as the value.
+     * @type { Record<string, Emitter> }
+     */
+    emitters: {},
+
+    /**
+     * Master gain node, where all `Emitter`s will send audio to.
+     */
+    masterGainNode: new GainNode(audioContext, {
+        channelCount: 2,
+        channelCountMode: "explicit",
+        channelInterpretation: "speakers"
+    }),
+
+    masterCompressorNode: new DynamicsCompressorNode(audioContext, {
+        threshold: -30,
+        knee: 5,
+        ratio: 1.5,
+        attack: 0.01,
+        release: 0.5
+    }),
+
+    initialize() {
+        this.masterGainNode.connect(this.masterCompressorNode);
+        this.masterCompressorNode.connect(audioContext.destination);
+        webaudio.OnInitialized();
+    },
+
+    /**
+     * @param { number } gain
+     */
+    setMasterVolume(gain) {
+        this.masterGainNode.gain.value = gain;
+    },
+
+    /**
+     * Set the location/orientation of the listener.
+     * 
+     * @param { number } x
+     * @param { number } y
+     * @param { number } z
+     * @param { number } forwardX
+     * @param { number } forwardY
+     * @param { number } forwardZ
+     * @param { number } upX
+     * @param { number } upY
+     * @param { number } upZ
+     */
+    setListenerLocation(x, y, z, forwardX, forwardY, forwardZ, upX, upY, upZ) {
+        const listener = audioContext.listener;
+
+        listener.positionX.value = x;
+        listener.positionY.value = y;
+        listener.positionZ.value = z;
+
+        listener.forwardX.value = forwardX;
+        listener.forwardY.value = forwardY;
+        listener.forwardZ.value = forwardZ;
+
+        listener.upX.value = upX;
+        listener.upY.value = upY;
+        listener.upZ.value = upZ;
+    },
+
+    /**
+     * @param { string } sampleId
+     * @return { boolean }
+     */
+    doesSampleExist(sampleId) {
+        return sampleId in this.samples;
+    },
+
+    /**
+     * Creates a `Sample`.
+     * The ID is used to create `Source`s with this `Sample` later,
+     * or to unload it from memory with `destroySample`.
+     * 
+     * @param { string } sampleId
+     * @param { string } filePath
+     */
+    createSample(sampleId, filePath) {
+        if (this.doesSampleExist(sampleId)) {
+            throw new Error(`Duplicate sampleId: ${sampleId}`);
+        }
+
+        const sample = new Sample(sampleId, filePath);
+
+        sample.onLoaded = () => {
+            this.samples[sampleId] = sample;
+            webaudio.OnSampleLoaded(sampleId);
+        };
+
+        sample.onLoadFailed = (reason) => {
+            delete this.samples[sampleId];
+            webaudio.OnSampleFailed(sampleId, reason);
+        };
+    },
+
+    /**
+     * Unload a `Sample`, which also stops all sources that are
+     * currently playing on it. Uses the same ID given to `createSample`.
+     * 
+     * @param { string } sampleId
+     */
+    destroySample(sampleId) {
+        if (!this.doesSampleExist(sampleId)) return;
+
+        this.samples[sampleId].destroy();
+        delete this.samples[sampleId];
+    },
+
+    /**
+     * @param { string } emitterId
+     * @return { boolean }
+     */
+    doesEmitterExist(emitterId) {
+        return emitterId in this.emitters;
+    },
+
+    /**
+     * Creates a `Emitter`.
+     * The ID is used to set the position, create/destroy `Source`s,
+     * and set parameters for this `Emitter` later.
+     * @param { string } emitterId
+     */
+    createEmitter(emitterId) {
+        if (this.doesEmitterExist(emitterId)) {
+            throw new Error(`Duplicate emitterId ${emitterId}`);
+        }
+
+        const emitter = new Emitter(emitterId);
+        this.emitters[emitterId] = emitter;
+
+        webaudio.OnEmitterCreated(emitterId);
+    },
+
+    /**
+     * @param { string } emitterId
+     */
+    destroyEmitter(emitterId) {
+        if (!this.doesEmitterExist(emitterId)) return;
+
+        this.emitters[emitterId].destroy();
+        delete this.emitters[emitterId];
+    },
+
+    /**
+     * @param { string } emitterId
+     * @param { number } x
+     * @param { number } y
+     * @param { number } z
+     */
+    emitterSetPosition(emitterId, x, y, z) {
+        if (emitterId in this.emitters)
+            this.emitters[emitterId].setPosition(x, y, z);
+    },
+
+    /**
+     * @param { number } maxDistance
+     */
+    emitterSetMaxDistance(emitterId, maxDistance) {
+        if (emitterId in this.emitters)
+            this.emitters[emitterId].setMaxDistance(maxDistance);
+    },
+
+    /**
+     * @param { string } emitterId
+     * @param { string? } irFileName
+     */
+    emitterSetImpulseResponseAudioFile(emitterId, irFileName) {
+        if (emitterId in this.emitters)
+            this.emitters[emitterId].setImpulseResponseAudioFile(irFileName);
+    },
+
+    /**
+     * @param { string } emitterId
+     * @param { boolean } enableHRTF
+     */
+    emitterSetHRTFEnabled(emitterId, enableHRTF) {
+        if (emitterId in this.emitters)
+            this.emitters[emitterId].setHRTFEnabled(enableHRTF);
+    },
+
+    /**
+     * @param { string } emitterId
+     * @param { string } sourceId
+     * @param { string } sampleId
+     * @param { number } gain
+     * @param { number? } playbackRate
+     * @param { number? } loopStart
+     * @param { number? } loopEnd
+     */
+    emitterCreateSource(emitterId, sourceId, sampleId, gain, playbackRate, loopStart, loopEnd) {
+        if (!this.doesEmitterExist(emitterId)) {
+            throw new Error(`Tried to call 'emitterCreateSource' on a invalid emitterId '${emitterId}'`);
+        }
+
+        this.emitters[emitterId].createSource(sourceId, sampleId, gain, playbackRate, loopStart, loopEnd);
+    },
+
+    /**
+     * @param { string } emitterId
+     * @param { string } sourceId
+     * @param { number } releaseTime
+     */
+    emitterDestroySource(emitterId, sourceId, releaseTime) {
+        if (!this.doesEmitterExist(emitterId)) {
+            throw new Error(`Tried to call 'emitterDestroySource' on a invalid emitterId '${emitterId}'`);
+        }
+
+        this.emitters[emitterId].destroySource(sourceId, releaseTime);
+    }
+};
+
+/**
+ * Fetch ArrayBuffer data using a HTTP request.
+ *
+ * @param { string } url
+ * @param { (arrayBuffer: ArrayBuffer) => void } resolve
+ * @param { (err: string) => void } reject
+ * @return { XMLHttpRequest } The request, can be used to abort it.
+ */
+const createArrayBufferRequest = (url, resolve, reject) => {
+    url = "asset://garrysmod/" + url;
+
+    const xhr = new XMLHttpRequest();
+    xhr.responseType = "arraybuffer";
+
+    xhr.onload = () => {
+        if (xhr.response) {
+            resolve(xhr.response);
+        }
+        else {
+            reject("No data could be fetched from: " + url);
+        }
+    };
+
+    xhr.onerror = () => {
+        reject(`Error when fetching data from ${url} (file may not exist)`);
+    };
+
+    xhr.onabort = () => {
+        reject("Aborted fetching data from: " + url);
+    };
+
+    xhr.timeout = 5000;
+    xhr.open("GET", url, true);
+    xhr.send();
+
+    return xhr;
+};
+
+class DestroyableObject {
+    wasDestroyed = false;
+
+    /**
+     * @param { string } id
+     */
+    constructor(id) {
+        /** @type { string } */
+        this.id = id;
+    }
+
+    destroy() { this.wasDestroyed = true; }
+    isValid() { return !this.wasDestroyed; }
+}
+
+/**
+ * Handles loading/unloading an audio buffer with HTTP requests.
+ */
+class Sample extends DestroyableObject {
+    /** @type { AudioBuffer? } */
+    audioBuffer = null;
+
+    /** @type { XMLHttpRequest? } */
+    request = null;
+
+    /** @type { () => void | null } */
+    onLoaded = null;
+
+    /** @type { (reason: string) => void | null } */
+    onLoadFailed = null;
+
+    /**
+     * @param { string } id
+     * @param { string } filePath
+     */
+    constructor(id, filePath) {
+        super(id);
+
+        this.request = createArrayBufferRequest(filePath, (arrayBuffer) => {
+            this.request = null;
+            this.onArrayBufferLoaded(arrayBuffer);
+        }, (err) => {
+            this.request = null;
+            this.onLoadError(err);
+        });
+    }
+
+    destroy() {
+        super.destroy();
+
+        // Abort exising HTTP request if it hasn't finished yet
+        if (this.request && this.request.readyState < 4) {
+            this.request.abort();
+            this.request = null;
+        }
+
+        this.audioBuffer = null;
+
+        // Iterate over every active `Emitter`, and destroy
+        // all `Source`s that are using our audio sample.
+        for (const emitterId in manager.emitters) {
+            const emitter = manager.emitters[emitterId];
+
+            for (const sourceId in emitter.sources) {
+                if (emitter.sources[sourceId].sampleId == this.id) {
+                    emitter.destroySource(sourceId);
+                }
+            }
+        }
+    }
+
+    isLoaded() {
+        return this.audioBuffer != null;
+    }
+
+    /**
+     * @param { ArrayBuffer } arrayBuffer
+     * @private
+     */
+    onArrayBufferLoaded(arrayBuffer) {
+        // `destroy` might have been called before the request could finish
+        if (!this.isValid()) return;
+
+        audioContext.decodeAudioData(arrayBuffer)
+            .then((audioBuffer) => {
+                // `destroy` might have been called before the decoding could finish
+                if (!this.isValid()) return;
+
+                this.audioBuffer = audioBuffer;
+                this.onLoaded?.();
+            })
+            .catch((err) => {
+                this.onLoadError("Could not decode audio: " + err);
+            });
+    }
+
+    /**
+     * @param { string } err
+     * @private
+     */
+    onLoadError(err) {
+        this.destroy();
+        this.onLoadFailed?.(err);
+    }
+}
+
+/**
+ * Handles the lifecycle of `Source`s, and sends their audio output
+ * to a shared "input", which has a location in 3D space (with optional effects).
+ */
+class Emitter extends DestroyableObject {
+    /**
+     * `Source`s that are currently playing samples.
+     * @type { Record<string, Source> }
+     */
+    sources = {};
+
+    /**
+     * Store all nodes used for routing audio
+     * @private
+     * @type { Record<string, AudioNode> }
+     */
+    audioGraph = {};
+
+    maxDistance = 500;
+
+    /**
+     * Current HTTP request to load the Impulse Response array buffer.
+     * @type { XMLHttpRequest? }
+     * @private
+    */
+    inpulseResponseRequest = null;
+
+    /**
+     * @param { string } id
+     */
+    constructor(id) {
+        super(id);
+
+        /** @type { GainNode } */
+        const gainNode = this.addNode("gain", GainNode, {
+            channelCount: 2,
+            channelCountMode: "explicit",
+            channelInterpretation: "discrete"
+        });
+
+        /** @type { PannerNode } */
+        const pannerNode = this.addNode("panner", PannerNode, {
+            channelCount: 2,
+            channelCountMode: "explicit",
+            channelInterpretation: "discrete",
+
+            panningModel: "equalpower",
+            distanceModel: "linear",
+            refDistance: 1,
+            maxDistance: this.maxDistance,
+            rolloffFactor: 1
+        });
+
+        gainNode.connect(pannerNode);
+        pannerNode.connect(manager.masterGainNode);
+    }
+
+    destroy() {
+        super.destroy();
+
+        // Disconnect and remove all nodes from our audio graph
+        // Disconnect and remove all nodes from our audio graph
+        for (const nodeId in this.audioGraph) {
+            this.audioGraph[nodeId].disconnect();
+            delete this.audioGraph[nodeId];
+        }
+    }
+
+    /**
+     * @private
+     * @param { string } nodeId
+     * @param { string } nodeClass
+     * @param { any } nodeOptions
+     * @return { AudioNode }
+     */
+    addNode(nodeId, nodeClass, nodeOptions) {
+        if (nodeId in this.audioGraph) {
+            throw new Error(`Graph node with id ${nodeId} already exists!`);
+        }
+
+        this.audioGraph[nodeId] = new nodeClass(audioContext, nodeOptions);
+
+        return this.audioGraph[nodeId];
+    }
+
+    /**
+     * @param { string } nodeId
+     */
+    removeNode(nodeId) {
+        if (!(nodeId in this.audioGraph)) return;
+
+        this.audioGraph[nodeId].disconnect();
+        delete this.audioGraph[nodeId];
+    }
+
+    /**
+     * @param { number } x
+     * @param { number } y
+     * @param { number } z
+     */
+    setPosition(x, y, z) {
+        const pannerNode = this.audioGraph["panner"];
+        pannerNode.positionX.value = x;
+        pannerNode.positionY.value = y;
+        pannerNode.positionZ.value = z;
+
+        const convolverPannerNode = this.audioGraph["convolverPanner"]; 
+        if (!convolverPannerNode) return;
+
+        convolverPannerNode.positionX.value = x;
+        convolverPannerNode.positionY.value = y;
+        convolverPannerNode.positionZ.value = z;
+    }
+
+    /**
+     * @param { number } maxDistance
+     */
+    setMaxDistance(maxDistance) {
+        if (!this.isValid()) {
+            throw new Error("Tried to call 'setMaxDistance' on a invalid Emitter!");
+        }
+
+        this.maxDistance = maxDistance;
+
+        const pannerNode = this.audioGraph["panner"];
+        const convolverPannerNode = this.audioGraph["convolverPanner"];
+
+        if (convolverPannerNode) {
+            convolverPannerNode.maxDistance = maxDistance;
+            pannerNode.maxDistance = maxDistance * 0.9;
+        }
+        else {
+            pannerNode.maxDistance = maxDistance;
+        }
+    }
+
+    /**
+     * @param { boolean } enableHRTF
+     */
+    setHRTFEnabled(enableHRTF) {
+        if (!this.isValid()) {
+            throw new Error("Tried to call 'setHRTFEnabled' on a invalid Emitter!");
+        }
+
+        this.audioGraph["panner"].panningModel = enableHRTF ? "HRTF" : "equalpower";
+    }
+
+    /**
+     * @param { string? } irFileName
+     */
+    setImpulseResponseAudioFile(irFileName) {
+        if (!this.isValid()) {
+            throw new Error("Tried to call 'setImpulseResponseAudioFile' on a invalid Emitter!");
+        }
+
+        // Abort an existing request if this function is called before it finishes
+        if (this.inpulseResponseRequest && this.inpulseResponseRequest.readyState < 4) {
+            this.inpulseResponseRequest.abort();
+        }
+
+        this.inpulseResponseRequest = null;
+
+        // Remove existing convolver node
+        this.removeNode("convolver");
+        this.removeNode("convolverPanner");
+
+        if (!irFileName || irFileName == "") {
+            return;
+        }
+
+        const filePath = "sound/musical_keyboard/impulse_responses/" + irFileName;
+
+        this.inpulseResponseRequest = createArrayBufferRequest(filePath, (arrayBuffer) => {
+            // `destroy` might have been called before the request could finish
+            if (!this.isValid()) return;
+
+            audioContext.decodeAudioData(arrayBuffer)
+                .then((audioBuffer) => {
+                    // `destroy` might have been called before the decoding could finish
+                    if (!this.isValid()) return;
+
+                    const pannerNode = this.audioGraph["panner"];
+
+                    // Create a separate panner for the convolver node
+                    /** @type { PannerNode } */
+                    const convolverPannerNode = this.addNode("convolverPanner", PannerNode, {
+                        channelCount: 1,
+                        channelCountMode: "explicit",
+                        channelInterpretation: "discrete",
+
+                        panningModel: "equalpower",
+                        distanceModel: "linear",
+                        refDistance: 1,
+                        maxDistance: this.maxDistance,
+                        rolloffFactor: 1
+                    });
+
+                    convolverPannerNode.positionX.value = pannerNode.positionX.value;
+                    convolverPannerNode.positionY.value = pannerNode.positionY.value;
+                    convolverPannerNode.positionZ.value = pannerNode.positionZ.value;
+
+                    /** @type { ConvolverNode } */
+                    const convolverNode = this.addNode("convolver", ConvolverNode, {
+                        channelCount: 1,
+                        channelCountMode: "explicit",
+                        channelInterpretation: "speakers",
+                    });
+
+                    convolverNode.normalize = true;
+                    convolverNode.buffer = audioBuffer;
+
+                    this.audioGraph["gain"].connect(convolverPannerNode);
+                    convolverPannerNode.connect(convolverNode);
+                    convolverNode.connect(manager.masterGainNode);
+
+                    // Update max. distance for both panners
+                    this.setMaxDistance(this.maxDistance);
+                })
+                .catch((err) => {
+                    console.log(`Could not decode Impulse Response audio '${filePath}': ${err}`);
+                });
+        }, (err) => {
+            console.log(`Could not load Impulse Response audio '${filePath}': ${err}`);
+        });
+    }
+
+    /**
+     * Stop and remove the `Source` associated with this `sourceId`.
+     * 
+     * @param { string } sourceId
+     * @param { number? } releaseTime
+     */
+    destroySource(sourceId, releaseTime) {
+        if (!this.isValid()) {
+            throw new Error("Tried to call 'destroySource' on a invalid Emitter!");
+        }
+
+        if (!(sourceId in this.sources)) return;
+
+        this.sources[sourceId].destroy(releaseTime);
+        delete this.sources[sourceId];
+    }
+
+    /**
+     * Create a new `Source` using the sound from `sampleId`.
+     * If a source with `sourceId` already exists, it will be replaced.
+     * 
+     * @param { string } sourceId
+     * @param { string } sampleId
+     * @param { number } gain
+     * @param { number? } playbackRate
+     * @param { number? } loopStart
+     * @param { number? } loopEnd
+     */
+    createSource(sourceId, sampleId, gain, playbackRate, loopStart, loopEnd) {
+        if (!this.isValid()) {
+            throw new Error("Tried to call 'createSource' on a invalid Emitter!");
+        }
+
+        this.destroySource(sourceId);
+
+        if (!manager.doesSampleExist(sampleId)) {
+            throw new Error("Tried to call 'createSource' with a invalid sampleId!");
+        }
+
+        const sample = manager.samples[sampleId];
+
+        if (!sample.audioBuffer) {
+            throw new Error("Tried to call 'createSource' on a sampleId that has not loaded yet!");
+        }
+
+        this.sources[sourceId] = new Source(sourceId, sample, this.audioGraph["gain"], gain, playbackRate, loopStart, loopEnd);
+    }
+}
+
+/**
+ * Represents a single sound source playing on a `Emitter`.
+ */
+class Source extends DestroyableObject {
+
+    /**
+     * @param { string } id
+     * @param { Sample } sample
+     * @param { AudioNode } targetNode
+     * @param { number } gain
+     * @param { number? } playbackRate
+     * @param { number? } loopStart
+     * @param { number? } loopEnd
+     */
+    constructor(id, sample, targetNode, gain, playbackRate, loopStart, loopEnd) {
+        super(id);
+
+        /** @type { string } */
+        this.sampleId = sample.id;
+
+        const gainNode = audioContext.createGain();
+        gainNode.gain.value = gain;
+        gainNode.channelCount = 2;
+        gainNode.channelCountMode = "explicit";
+
+        const sourceNode = audioContext.createBufferSource();
+        sourceNode.buffer = sample.audioBuffer;
+
+        /** @type { GainNode | null } */
+        this.gainNode = gainNode;
+
+        /** @type { AudioBufferSourceNode | null } */
+        this.sourceNode = sourceNode;
+
+        if (playbackRate) {
+            sourceNode.playbackRate.value = playbackRate;
+        }
+
+        if (loopStart || loopEnd) {
+            sourceNode.loop = true;
+            sourceNode.loopStart = Math.max(loopStart || 0, 0.0);
+            sourceNode.loopEnd = Math.max(loopEnd || 0, -1.0);
+        }
+
+        gainNode.connect(targetNode);
+        sourceNode.connect(gainNode);
+        sourceNode.start();
+    }
+
+    /**
+     * @param { number } releaseTime
+     */
+    destroy(releaseTime = 0.0) {
+        super.destroy();
+
+        const sourceNode = this.sourceNode;
+        const gainNode = this.gainNode;
+
+        this.gainNode = null;
+        this.sourceNode = null;
+
+        if (releaseTime > 0 && gainNode && sourceNode) {
+            const currentTime = audioContext.currentTime;
+
+            gainNode.gain.setValueAtTime(gainNode.gain.value, currentTime);
+            gainNode.gain.linearRampToValueAtTime(0, currentTime + releaseTime);
+
+            sourceNode.onended = () => {
+                sourceNode.disconnect();
+                gainNode.disconnect();
+            };
+
+            // The GC will handle unassigning the buffer and
+            // deleting the gain/source nodes after it stops playing.
+            sourceNode.stop(currentTime + releaseTime);
+        }
+        else {
+            if (gainNode) {
+                gainNode.disconnect();
+            }
+
+            if (sourceNode) {
+                sourceNode.buffer = null;
+                sourceNode.disconnect();
+                sourceNode.stop();
+            }
+        }
+    }
+}
+
+/*
+    Initialize only after all classes have been created
+*/
+
+manager.initialize();
