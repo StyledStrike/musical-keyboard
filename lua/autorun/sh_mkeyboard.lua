@@ -12,6 +12,11 @@ MKeyboard.MIDI_CHANNEL_ID_MAX = 15
 ]]
 MKeyboard.MAX_PROCESSING_DISTANCE = 1000
 
+--[[
+    Max. number of notes that can play simultaneously per entity
+]]
+MKeyboard.MAX_EMITTER_SOURCES = 30
+
 -- Sandbox limits
 cleanup.Register( "musical_keyboards" )
 

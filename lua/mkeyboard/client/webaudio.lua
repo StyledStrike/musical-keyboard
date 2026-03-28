@@ -429,6 +429,7 @@ function WebAudio.CreateEmitter( onReady )
     local emitter = setmetatable( {
         id = id,
         sources = {},
+        sourceCount = 0,
         properties = {},
         onReady = onReady,
 
@@ -459,6 +460,7 @@ function Emitter:Destroy()
     self.id = nil
 
     self.sources = nil
+    self.sourceCount = nil
     self.properties = nil
 
     setmetatable( self, nil )
@@ -513,6 +515,10 @@ function Emitter:CreateSource( sourceId, sampleId, gain, playbackRate, loopStart
     assert( loopStart == nil or type( loopStart ) == "number", "'loopStart' must be a number!" )
     assert( loopEnd == nil or type( loopEnd ) == "number", "'loopEnd' must be a number!" )
 
+    if not self.sources[sourceId] then
+        self.sourceCount = self.sourceCount + 1
+    end
+
     self.sources[sourceId] = {
         sampleId = sampleId,
         gain = gain,
@@ -537,6 +543,7 @@ function Emitter:DestroySource( sourceId, releaseTime )
     end
 
     self.sources[sourceId] = nil
+    self.sourceCount = self.sourceCount - 1
 end
 
 function Emitter:Think()

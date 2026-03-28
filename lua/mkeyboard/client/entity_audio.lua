@@ -185,7 +185,10 @@ function MKeyboard.EntityPlayNote( ent, channelIndex, note, velocity, instrument
     local instrument = UseInstrument( instrumentIndex )
     if not instrument then return end
 
-    -- TODO: Add a limit to how many notes can play simultaneously
+    if emitter.sourceCount >= MKeyboard.MAX_EMITTER_SOURCES then
+        MKeyboard.Print( "Ignoring EntityPlayNote since '%s' has reached the MAX_EMITTER_SOURCES limit!", emitter.id )
+        return
+    end
 
     local sample, pitch = GetSampleFromNote( instrument, note )
     local sampleId = SAMPLE_ID_FORMAT:format( instrumentIndex, sample.fileName )
