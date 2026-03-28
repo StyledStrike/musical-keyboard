@@ -93,7 +93,7 @@ local function IncludeDir( dirPath, doInclude, doTransfer )
 end
 
 if SERVER then
-    -- TODO: resource.AddWorkshop( "2656563609" )
+    resource.AddWorkshop( "2656563609" )
 
     -- Shared files
     IncludeDir( "mkeyboard/", true, true )
