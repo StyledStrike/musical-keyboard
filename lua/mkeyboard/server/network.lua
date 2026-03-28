@@ -37,10 +37,11 @@ net.Receive( "mkeyboard.notes", function( _, ply )
     if not MKeyboard.IsAMusicalKeyboard( entity ) then return end
     if ply ~= entity.activePlayer then return end
 
+    local events = MKeyboard.ReadEvents()
+    entity:OnReceiveNoteEvents( events )
+
     local targets = GetNearbyPlayers( entity:GetPos(), ply )
     if #targets < 1 then return end
-
-    local events = MKeyboard.ReadEvents()
 
     net.Start( "mkeyboard.notes", false )
     net.WriteEntity( entity )

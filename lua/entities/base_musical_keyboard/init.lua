@@ -28,6 +28,46 @@ function ENT:Initialize()
     if IsValid( phys ) then phys:Wake() end
 
     self.activePlayer = nil
+
+    if WireLib then
+        WireLib.CreateSpecialInputs( self,
+            { "PressNote", "ReleaseNote" },
+            { "ARRAY", "ARRAY" },
+            { [[Changing this input will press a note (and keep it pressed).
+The array should contain:
+[1] Note MIDI number (0-127)
+[2] Note velocity (0-127)
+[3] Channel index (Between 0 and 15)
+[4] Instrument index (The number near each name on the instruments list)]],
+            [[Changing this input will release a note.
+The array should contain:
+[1] Note MIDI number (0-127)
+[2] Channel index (Between 0 and 15)]]
+        } )
+
+        WireLib.CreateSpecialOutputs( self,
+            { "NotePressed", "NoteReleased" },
+            { "ARRAY", "ARRAY" },
+            { [[Triggered when the user played a note.
+This array contains:
+[1] Note MIDI number (0-127)
+[2] Note velocity (0-127)
+[3] Channel index (Between 0 and 15)
+[4] Instrument index (The number near each name on the instruments list)
+[5] Was the note played via an external MIDI device/program? (1 for "Yes", 0 for "No"))]],
+            [[Triggered when the user released a note.
+This array contains:
+[1] Note MIDI number (0-127)
+[2] Channel index (Between 0 and 15)]]
+        } )
+
+        self.wireReproduceEvents = {}
+        self.wireReproduceLastId = 0
+
+        self.wireTransmitBuffer = {}
+        self.wireTransmitCount = 0
+        self.wireNextTransmitTime = 0
+    end
 end
 
 local IsValid = IsValid
@@ -70,8 +110,11 @@ function ENT:RemovePlayer()
     net.Send( targets )
 end
 
+local CurTime = CurTime
+
 function ENT:Think()
-    self:NextThink( CurTime() + 0.1 )
+    local time = CurTime()
+    self:NextThink( time )
 
     if IsValid( self.activePlayer ) and (
         not self.activePlayer:Alive() or
@@ -80,106 +123,168 @@ function ENT:Think()
         self:RemovePlayer()
     end
 
+    self:ProcessServerNotes( time )
+
     return true
 end
 
-
---[[
-
-    if WireLib then
-        WireLib.CreateSpecialOutputs( self, { "NotePlayed" }, { "ARRAY" }, {
-            [[Triggered when the user played a note.
-This array contains:
-[1] Note number,
-[2] Note velocity
-[3] Instrument index (The number near each name on the instruments list)] ]
-        } )
-
-        WireLib.CreateSpecialInputs( self, { "PlayNote" }, { "ARRAY" }, {
-            [[Changing this input will play a note.
-The array should contain:
-[1] Note number (1-127)
-[2] Note velocity (1-127)
-[3] Instrument index (The number near each name on the instruments list)] ]
-        } )
-
-        self.reproduceQueue = {}
-        self.transmitQueue = {}
-    end
-end
-
 if not WireLib then
-    function ENT:UpdateNotes() end
-    function ENT:OnReceiveNotes() end
+    -- Dummy functions
+    function ENT:ProcessServerNotes( _t ) end
+    function ENT:OnReceiveNoteEvents( _events ) end
+
     return
 end
 
-function ENT:TriggerInput( name, value )
-    if name ~= "PlayNote" then return end
-    if not isnumber( value[1] ) then return end
+function ENT:OnReceiveNoteEvents( events )
+    local reproduceEvents = self.wireReproduceEvents
 
-    local note = ValidateNumber( value[1], 0, 0, 127 )
-    if note == 0 then return end
-
-    local velocity = ValidateNumber( value[2], 127, 1, 127 )
-    local instrument = ValidateNumber( value[3], 1, 1, 127 ) -- Max. value is based on net.WriteUInt( 7 )
-
-    local queue = self.transmitQueue
-
-    -- Remember when we started putting notes
-    -- on the queue, and when we should send them
-    local t = SysTime()
-
-    if not self.queueTimer then
-        self.queueTimer = t + 0.4
-        self.queueStart = t
+    if #events < 1 then
+        table.Empty( reproduceEvents )
+        return
     end
 
-    -- Add notes to the queue unless the limit was reached
-    local noteCount = #queue
+    -- Queue events to be sent to the Wire output
+    local id = self.wireReproduceLastId
 
-    if noteCount < MKeyboard.NET_MAX_NOTES then
-        queue[noteCount + 1] = {
-            note, velocity, instrument, t - self.queueStart
-        }
+    for _, event in ipairs( events ) do
+        id = id + 1
+        reproduceEvents[id] = event
     end
+
+    self.wireReproduceLastId = id
 end
 
-local SysTime = SysTime
+local TRANSMIT_BUFFER_INTERVAL = MKeyboard.TRANSMIT_BUFFER_INTERVAL
+local TriggerOutput = WireLib.TriggerOutput
+local GetNearbyPlayers = MKeyboard.GetNearbyPlayers
 
-function ENT:OnReceiveNotes( notes )
-    local t = SysTime()
-    local queue = self.reproduceQueue
+local notePressOutputTable = {}
+local noteReleaseOutputTable = {}
 
-    for i, n in ipairs( notes ) do
-        -- i * 0.01 to prevent overriding stuff already on the queue
-        queue[t + n[4] + ( i * 0.01 )] = { n[1], n[2], n[3] }
+function ENT:ProcessServerNotes( t )
+    -- We do a similar "note transmit" logic used on the client-side,
+    -- but our source of events are Wire inputs.
+    if t > self.wireNextTransmitTime and self.wireTransmitCount > 0 then
+        self.wireNextTransmitTime = t + TRANSMIT_BUFFER_INTERVAL
+        self.wireTransmitCount = 0
+
+        local targets = GetNearbyPlayers( self:GetPos() )
+
+        if #targets > 0 then
+            net.Start( "mkeyboard.notes", false )
+            net.WriteEntity( self )
+            MKeyboard.WriteEvents( self.wireTransmitBuffer )
+            net.Send( targets )
+        end
+
+        table.Empty( self.wireTransmitBuffer )
     end
-end
 
-local GetKeys = table.GetKeys
+    -- We do a similar logic used on the client-side, but instead of playing the notes,
+    -- we output note events via Wire with the correct timing.
+    t = t - TRANSMIT_BUFFER_INTERVAL * 2
 
-function ENT:UpdateNotes()
-    local now = SysTime()
+    -- Process note start/stop events according to ther timestamp.
+    local reproduceEvents = self.wireReproduceEvents
 
-    -- If the queued notes are ready to be sent...
-    if self.queueTimer and now > self.queueTimer then
-        MKeyboard.BroadcastNotes( self.transmitQueue, self, true )
+    -- We must process the note press events first, since the note release
+    -- event for the same channel/note might come in the same tick.
+    for id, event in pairs( reproduceEvents ) do
+        if t >= event.time and event.instrumentIndex then
+            reproduceEvents[id] = nil
 
-        table.Empty( self.transmitQueue )
-        self.queueTimer = nil
+            notePressOutputTable[1] = event.note
+            notePressOutputTable[2] = event.velocity
+            notePressOutputTable[3] = event.channelIndex
+            notePressOutputTable[4] = event.instrumentIndex
+            notePressOutputTable[5] = event.isAutomated and 1 or 0
+
+            TriggerOutput( self, "NotePressed", notePressOutputTable )
+        end
     end
 
-    -- Trigger the wire outputs while taking the time offsets into account
-    local queue = self.reproduceQueue
-    local timestamps = GetKeys( queue )
+    for id, event in pairs( reproduceEvents ) do
+        if t >= event.time and not event.instrumentIndex then
+            reproduceEvents[id] = nil
 
-    for _, t in ipairs( timestamps ) do
-        if now > t then
-            local n = queue[t]
-            WireLib.TriggerOutput( self, "NotePlayed", { n[1], n[2], n[3] } )
-            queue[t] = nil
+            noteReleaseOutputTable[1] = event.note
+            noteReleaseOutputTable[2] = event.channelIndex
+
+            TriggerOutput( self, "NoteReleased", noteReleaseOutputTable )
         end
     end
 end
-]]
+
+local MIDI_CHANNEL_ID_MIN = MKeyboard.MIDI_CHANNEL_ID_MIN
+local MIDI_CHANNEL_ID_MAX = MKeyboard.MIDI_CHANNEL_ID_MAX
+local MAX_NOTE_EVENTS = MKeyboard.MAX_NOTE_EVENTS
+
+local ValidateNumber = MKeyboard.ValidateNumber
+
+function ENT:TriggerInput( name, value )
+    local transmitBuffer = self.wireTransmitBuffer
+    local transmitCount = self.wireTransmitCount
+
+    if name == "PressNote" then
+        local note = ValidateNumber( value[1], 0, 127, 0 )
+        if note < 1 then return end
+
+        local velocity = ValidateNumber( value[2], 0, 127, 0 )
+        if velocity < 1 then return end
+
+        local channel = ValidateNumber( value[3], MIDI_CHANNEL_ID_MIN, MIDI_CHANNEL_ID_MAX, -1 )
+        if channel < 0 then return end
+
+        local instrument = ValidateNumber( value[4], 0, 127, 0 )
+        if instrument < 1 then return end
+
+        -- Do not add more note press events when the buffer is full
+        if transmitCount >= MAX_NOTE_EVENTS then return end
+
+        local event = {
+            time = CurTime(), -- The time when the note was pressed
+            note = note,
+            velocity = velocity,
+            channelIndex = channel,
+            instrumentIndex = instrument,
+            isAutomated = true
+        }
+
+        transmitCount = transmitCount + 1
+        transmitBuffer[transmitCount] = event
+
+    elseif name == "ReleaseNote" then
+        local note = ValidateNumber( value[1], 0, 127, 0 )
+        if note < 1 then return end
+
+        local channel = ValidateNumber( value[2], MIDI_CHANNEL_ID_MIN, MIDI_CHANNEL_ID_MAX, -1 )
+        if channel < 0 then return end
+
+        -- Remove all note press events if the buffer is full
+        if transmitCount >= MKeyboard.MAX_NOTE_EVENTS then
+            local event
+
+            for i = transmitCount, 1, -1 do
+                event = transmitBuffer[i]
+
+                if event.instrumentIndex then
+                    table.remove( transmitBuffer, i )
+                end
+            end
+
+            transmitCount = #transmitBuffer
+        end
+
+        local event = {
+            time = CurTime(), -- The time when the note was released
+            note = note,
+            channelIndex = channel
+        }
+
+        transmitCount = transmitCount + 1
+        transmitBuffer[transmitCount] = event
+    end
+
+    self.wireTransmitCount = transmitCount
+end
