@@ -19,13 +19,23 @@ end
 
 MKeyboard.GetNearbyPlayers = GetNearbyPlayers
 
+local netCooldown = {}
+
 net.Receive( "mkeyboard.notes", function( _, ply )
+    local id = ply:SteamID()
+    local t = RealTime()
+
+    if netCooldown[id] and netCooldown[id] > t then
+        MKeyboard.Print( "%s <%s> sent network commands too fast!", ply:Nick(), id )
+        return
+    end
+
+    netCooldown[id] = t + MKeyboard.TRANSMIT_BUFFER_INTERVAL * 0.25
+
     local entity = net.ReadEntity()
 
     if not MKeyboard.IsAMusicalKeyboard( entity ) then return end
     if ply ~= entity.activePlayer then return end
-
-    -- TODO: spam prevention
 
     local targets = GetNearbyPlayers( entity:GetPos(), ply )
     if #targets < 1 then return end
@@ -36,4 +46,8 @@ net.Receive( "mkeyboard.notes", function( _, ply )
     net.WriteEntity( entity )
     MKeyboard.WriteEvents( events )
     net.Send( targets )
+end )
+
+hook.Add( "PlayerDisconnected", "MKeyboard.NetCleanup", function( ply )
+    netCooldown[ply:SteamID()] = nil
 end )
