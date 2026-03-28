@@ -439,14 +439,13 @@ class Emitter extends DestroyableObject {
             channelInterpretation: "discrete",
 
             panningModel: "equalpower",
-            distanceModel: "linear",
-            refDistance: 1,
-            maxDistance: this.maxDistance,
-            rolloffFactor: 1
+            distanceModel: "inverse",
         });
 
         gainNode.connect(pannerNode);
         pannerNode.connect(manager.masterGainNode);
+
+        this.setMaxDistance(this.maxDistance);
     }
 
     destroy() {
@@ -517,14 +516,17 @@ class Emitter extends DestroyableObject {
         this.maxDistance = maxDistance;
 
         const pannerNode = this.audioGraph["panner"];
+
+        pannerNode.maxDistance = maxDistance;
+        pannerNode.refDistance = maxDistance * 0.05;
+        pannerNode.rolloffFactor = 1.0;
+    
         const convolverPannerNode = this.audioGraph["convolverPanner"];
 
         if (convolverPannerNode) {
-            convolverPannerNode.maxDistance = maxDistance;
-            pannerNode.maxDistance = maxDistance * 0.9;
-        }
-        else {
-            pannerNode.maxDistance = maxDistance;
+            convolverPannerNode.maxDistance = maxDistance * 0.9;
+            convolverPannerNode.refDistance = 1.0;
+            convolverPannerNode.rolloffFactor = 1.5;
         }
     }
 
@@ -584,9 +586,6 @@ class Emitter extends DestroyableObject {
 
                         panningModel: "equalpower",
                         distanceModel: "linear",
-                        refDistance: 1,
-                        maxDistance: this.maxDistance,
-                        rolloffFactor: 1
                     });
 
                     convolverPannerNode.positionX.value = pannerNode.positionX.value;

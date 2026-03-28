@@ -10,7 +10,7 @@ MKeyboard.MIDI_CHANNEL_ID_MAX = 15
     - Sending note network events to nearby players only
     - Processing client-side sounds for nearby keyboards only
 ]]
-MKeyboard.MAX_PROCESSING_DISTANCE = 1000
+MKeyboard.MAX_PROCESSING_DISTANCE = 1500
 
 --[[
     Max. number of notes that can play simultaneously per entity
