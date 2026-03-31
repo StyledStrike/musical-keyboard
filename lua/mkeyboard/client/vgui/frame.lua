@@ -674,7 +674,7 @@ function PANEL:OpenMIDIChannelsDialog()
             if channelInstrumentMap[channelIndex] then
                 combo:ChooseOptionID( channelInstrumentMap[channelIndex] + 2 )
             else
-                combo:ChooseOptionID( -1 )
+                combo:ChooseOptionID( 1 )
             end
 
             combo._isBeingModifiedByCode = nil
