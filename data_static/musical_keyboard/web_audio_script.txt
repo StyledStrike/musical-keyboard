@@ -2,9 +2,9 @@
     This code was placed on a separate file to get
     better autocomplete/JSDoc support on my editor.
 
-    It is not loaded by Lua directly, instead this code
-    should be minified (with something like Terser via minify-js.com)
-    and stored as a Lua string on `lua/mkeyboard/client/webaudio.lua`
+    It is not loaded by Lua directly, instead this code should be
+    minified (with something like Terser via minify-js.com), and stored as
+    a string on `WebAudio.GetJavaScript` (`lua/mkeyboard/client/webaudio.lua`)
 */
 
 const audioContext = new AudioContext();
@@ -439,7 +439,7 @@ class Emitter extends DestroyableObject {
             channelInterpretation: "discrete",
 
             panningModel: "equalpower",
-            distanceModel: "inverse",
+            distanceModel: "linear",
         });
 
         gainNode.connect(pannerNode);
@@ -518,15 +518,15 @@ class Emitter extends DestroyableObject {
         const pannerNode = this.audioGraph["panner"];
 
         pannerNode.maxDistance = maxDistance;
-        pannerNode.refDistance = maxDistance * 0.05;
-        pannerNode.rolloffFactor = 1.0;
-    
+        pannerNode.refDistance = 1.0;
+        pannerNode.rolloffFactor = 2.0;
+
         const convolverPannerNode = this.audioGraph["convolverPanner"];
 
         if (convolverPannerNode) {
-            convolverPannerNode.maxDistance = maxDistance * 0.9;
+            convolverPannerNode.maxDistance = maxDistance;
             convolverPannerNode.refDistance = 1.0;
-            convolverPannerNode.rolloffFactor = 1.5;
+            convolverPannerNode.rolloffFactor = 3.0;
         }
     }
 
@@ -606,7 +606,7 @@ class Emitter extends DestroyableObject {
                     convolverPannerNode.connect(convolverNode);
                     convolverNode.connect(manager.masterGainNode);
 
-                    // Update max. distance for both panners
+                    // Update max. distance for both panner nodes
                     this.setMaxDistance(this.maxDistance);
                 })
                 .catch((err) => {

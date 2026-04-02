@@ -61,8 +61,8 @@ function RangedEmitter:Deactivate()
 end
 
 do
-    local activateDist = MAX_PROCESSING_DISTANCE * 0.9
-    local deactivateDist = MAX_PROCESSING_DISTANCE
+    local activateDist = MAX_PROCESSING_DISTANCE
+    local deactivateDist = MAX_PROCESSING_DISTANCE * 1.2
 
     activateDist = activateDist * activateDist
     deactivateDist = deactivateDist * deactivateDist
