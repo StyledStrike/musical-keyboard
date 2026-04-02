@@ -30,8 +30,8 @@ function RangedEmitter:Activate()
     self.activeNotes = {}
 
     -- Store the events that we receive from the server to reproduce later
-    self.reproduceEvents = {}
-    self.reproduceLastId = 0
+    self.reproduceNoteOnEvents = {}
+    self.reproduceNoteOffEvents = {}
 
     if not self.emitter then
         self.emitter = MKeyboard.WebAudio.CreateEmitter()
@@ -56,8 +56,8 @@ function RangedEmitter:Deactivate()
     self.emitter = nil
     self.channels = nil
     self.activeNotes = nil
-    self.reproduceEvents = nil
-    self.reproduceLastId = nil
+    self.reproduceNoteOnEvents = nil
+    self.reproduceNoteOffEvents = nil
 end
 
 do

@@ -306,25 +306,34 @@ net.Receive( "mkeyboard.notes", function()
     local rangedEmitter = ent.rangedEmitter
     if not rangedEmitter then return end
 
-    local reproduceEvents = rangedEmitter.reproduceEvents
-    if not reproduceEvents then return end
+    local reproduceNoteOnEvents = rangedEmitter.reproduceNoteOnEvents
+    if not reproduceNoteOnEvents then return end
 
+    local reproduceNoteOffEvents = rangedEmitter.reproduceNoteOffEvents
     local events = MKeyboard.ReadEvents()
 
     -- An empty buffer means "stop all notes".
     if #events < 1 then
-        table.Empty( reproduceEvents )
+        table.Empty( reproduceNoteOnEvents )
+        table.Empty( reproduceNoteOffEvents )
+
         MKeyboard.EntityReleaseAllNotes( ent )
+
         return
     end
 
-    -- Queue events to be reproduced
-    local id = rangedEmitter.reproduceLastId
+    -- Queue events to be reproduced, splitting
+    -- note on/off events into separate tables.
+    local indexNoteOn = #reproduceNoteOnEvents
+    local indexNoteOff = #reproduceNoteOffEvents
 
     for _, event in ipairs( events ) do
-        id = id + 1
-        reproduceEvents[id] = event
+        if event.instrumentIndex then
+            indexNoteOn = indexNoteOn + 1
+            reproduceNoteOnEvents[indexNoteOn] = event
+        else
+            indexNoteOff = indexNoteOff + 1
+            reproduceNoteOffEvents[indexNoteOff] = event
+        end
     end
-
-    rangedEmitter.reproduceLastId = id
 end )

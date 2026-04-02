@@ -14,33 +14,68 @@ function ENT:OnRemove( fullUpdate )
 end
 
 local CurTime = CurTime
+local TableRemove = table.remove
+
 local EntityPlayNote = MKeyboard.EntityPlayNote
 local EntityStopNote = MKeyboard.EntityStopNote
 
+local removeIndexes = {}
+
+local function ProcessMarkedForRemoval( queue )
+    -- We have to transverse the queue backwards
+    -- to avoid issues with the indexes shifting.
+    for index = #queue, 1, -1 do
+        if removeIndexes[index] then
+            removeIndexes[index] = nil
+            TableRemove( queue, index )
+        end
+    end
+end
+
+--[[
+    Process note start/stop events according to their timestamp,
+    removing them from the note press/release event queues.
+
+    Note that we process events with a FIFO (first in, first out) logic,
+    and that we process the note press events before note release events,
+    since a note release event for the same channel/note might come in the same tick.
+]]
 local function ProcessPlaybackQueue( ent, rangedEmitter )
     -- For proper timing, we offset the playback time by
     -- two times the buffer transmission interval.
     -- (Look for the `MKeyboard.TransmitNotes` timer on mkeyboard/client/events.lua)
     local t = CurTime() - MKeyboard.TRANSMIT_BUFFER_INTERVAL * 2
 
-    -- Process note start/stop events according to ther timestamp.
-    local reproduceEvents = rangedEmitter.reproduceEvents
+    local noteOnEvents = rangedEmitter.reproduceNoteOnEvents
+    local event
 
-    -- We must process the note press events first, since the note release
-    -- event for the same channel/note might come in the same tick.
-    for id, event in pairs( reproduceEvents ) do
-        if t >= event.time and event.instrumentIndex then
-            reproduceEvents[id] = nil
+    for index = 1, #noteOnEvents do
+        event = noteOnEvents[index]
+
+        if t >= event.time then
+            -- Mark from removal from the queue
+            removeIndexes[index] = true
+
             EntityPlayNote( ent, event.channelIndex, event.note, event.velocity, event.instrumentIndex, event.isAutomated )
         end
     end
 
-    for id, event in pairs( reproduceEvents ) do
-        if t >= event.time and not event.instrumentIndex then
-            reproduceEvents[id] = nil
+    ProcessMarkedForRemoval( noteOnEvents )
+
+    local noteOffEvents = rangedEmitter.reproduceNoteOffEvents
+
+    for index = 1, #noteOffEvents do
+        event = noteOffEvents[index]
+
+        if t >= event.time then
+            -- Mark from removal from the queue
+            removeIndexes[index] = true
+
             EntityStopNote( ent, event.channelIndex, event.note )
         end
     end
+
+    ProcessMarkedForRemoval( noteOffEvents )
 end
 
 function ENT:Think()
@@ -51,7 +86,7 @@ function ENT:Think()
     if rangedEmitter then
         rangedEmitter:Think()
 
-        if rangedEmitter.reproduceEvents then
+        if rangedEmitter.reproduceNoteOnEvents then
             ProcessPlaybackQueue( self, rangedEmitter )
         end
     end
