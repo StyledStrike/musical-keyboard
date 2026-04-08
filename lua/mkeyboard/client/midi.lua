@@ -155,10 +155,13 @@ end
 local channelState = MIDI.channelState
 
 hook.Add( "MIDI", "MKeyboard.CaptureMIDIEvents", function( _, code, p1, p2 )
+    if not code then return end
+
+    local cmd = midi.GetCommandName( code )
+
     local frame = MKeyboard.frame
     if not IsValid( frame ) then return end
 
-    local cmd = midi.GetCommandName( code )
     local Config = MKeyboard.Config
 
     if cmd == "NOTE_ON" and p2 > 0 then
