@@ -35,7 +35,7 @@ MKeyboard:RegisterInstrument( "Grand Piano", "sound/musical_keyboard/instruments
 { note = 100, fileName = "E7.ogg" },
 { note = 103, fileName = "G7.ogg" }
 }, {
-    volume = 0.8,
+    volume = 0.5,
     releaseTime = 0.15
 } )
 
@@ -76,7 +76,7 @@ MKeyboard:RegisterInstrument( "Grand Piano (Soft)", "sound/musical_keyboard/inst
 { note = 100, fileName = "E7.ogg" },
 { note = 103, fileName = "G7.ogg" }
 }, {
-    volume = 0.7,
+    volume = 0.5,
     releaseTime = 0.2
 } )
 
@@ -96,7 +96,7 @@ MKeyboard:RegisterInstrument( "Honky Tonk", "sound/musical_keyboard/instruments/
 { note = 96, fileName = "C7.ogg" },
 { note = 103, fileName = "G7.ogg" }
 }, {
-    volume = 0.4,
+    volume = 0.28,
     releaseTime = 0.2
 } )
 
@@ -118,7 +118,7 @@ MKeyboard:RegisterInstrument( "Electric Piano", "sound/musical_keyboard/instrume
 { note = 92, fileName = "G^6.ogg", loopStart = 2.564082, loopEnd = 3.397619 },
 { note = 96, fileName = "C7.ogg",  loopStart = 2.182857, loopEnd = 3.016168 }
 }, {
-    volume = 0.3
+    volume = 0.2
 } )
 
 MKeyboard:RegisterInstrument( "Analog Piano", "sound/musical_keyboard/instruments/analog_piano", {
@@ -158,7 +158,7 @@ MKeyboard:RegisterInstrument( "Analog Piano", "sound/musical_keyboard/instrument
 { note = 100, fileName = "E7.ogg" },
 { note = 103, fileName = "G7.ogg" }
 }, {
-    volume = 0.5,
+    volume = 0.35,
     releaseTime = 0.3
 } )
 
@@ -192,7 +192,7 @@ MKeyboard:RegisterInstrument( "Binary Piano", "sound/musical_keyboard/instrument
 { note = 100, fileName = "E7.ogg" },
 { note = 103, fileName = "G7.ogg" }
 }, {
-    volume = 0.6,
+    volume = 0.4,
     releaseTime = 0.3
 } )
 
@@ -203,7 +203,7 @@ MKeyboard:RegisterInstrument( "New Age", "sound/musical_keyboard/instruments/new
 { note = 72, fileName = "C5.ogg", loopStart = 1.395170, loopEnd = 4.170136 },
 { note = 84, fileName = "C6.ogg", loopStart = 1.777007, loopEnd = 3.984444 },
 }, {
-    volume = 0.4
+    volume = 0.3
 } )
 
 MKeyboard:RegisterInstrument( "Soft Synth", "sound/musical_keyboard/instruments/soft_synth", {
@@ -215,7 +215,7 @@ MKeyboard:RegisterInstrument( "Soft Synth", "sound/musical_keyboard/instruments/
     { note = 84, fileName = "C6.ogg", loopStart = 1.611497, loopEnd = 5.428753 },
     { note = 96, fileName = "C7.ogg", loopStart = 1.984399, loopEnd = 5.960340 }
 }, {
-    volume = 0.55,
+    volume = 0.45,
     releaseTime = 0.3
 } )
 
@@ -226,7 +226,7 @@ MKeyboard:RegisterInstrument( "Polysynth", "sound/musical_keyboard/instruments/p
 { note = 84, fileName = "C6.ogg", loopStart = 1.630204, loopEnd = 4.066236 },
 { note = 96, fileName = "C7.ogg", loopStart = 0.981066, loopEnd = 2.791406 }
 }, {
-    volume = 0.6,
+    volume = 0.45,
     releaseTime = 0.3
 } )
 
@@ -238,7 +238,7 @@ MKeyboard:RegisterInstrument( "Space Voice", "sound/musical_keyboard/instruments
 { note = 84, fileName = "C6.ogg", loopStart = 1.215873, loopEnd = 3.039637 },
 { note = 96, fileName = "C7.ogg", loopStart = 1.059728, loopEnd = 2.577460 }
 }, {
-    volume = 0.55,
+    volume = 0.35,
     releaseTime = 0.3
 } )
 
@@ -249,7 +249,7 @@ MKeyboard:RegisterInstrument( "Music Box", "sound/musical_keyboard/instruments/m
 { note = 84, fileName = "C6.ogg" },
 { note = 96, fileName = "C7.ogg" }
 }, {
-    volume = 0.4,
+    volume = 0.3,
     releaseTime = 0.2
 } )
 
@@ -265,7 +265,7 @@ MKeyboard:RegisterInstrument( "Harp", "sound/musical_keyboard/instruments/harp",
 { note = 78, fileName = "F^5.ogg" },
 { note = 83, fileName = "B5.ogg" }
 }, {
-    volume = 0.45,
+    volume = 0.4,
     releaseTime = 0.3
 } )
 
@@ -306,7 +306,7 @@ MKeyboard:RegisterInstrument( "Harpsichord", "sound/musical_keyboard/instruments
 { note = 84, fileName = "C6.ogg" },
 { note = 85, fileName = "C^6.ogg" }
 }, {
-    volume = 0.2,
+    volume = 0.16,
     releaseTime = 0.3
 } )
 
@@ -323,7 +323,7 @@ MKeyboard:RegisterInstrument( "Nylon Guitar", "sound/musical_keyboard/instrument
 { note = 72, fileName = "C5.ogg" },
 { note = 79, fileName = "G5.ogg" }
 }, {
-    volume = 0.7,
+    volume = 0.5,
     releaseTime = 0.2
 } )
 
@@ -342,7 +342,7 @@ MKeyboard:RegisterInstrument( "Jazz Guitar", "sound/musical_keyboard/instruments
 { note = 79, fileName = "G5.ogg" },
 { note = 82, fileName = "A^5.ogg" }
 }, {
-    volume = 0.7,
+    volume = 0.5,
     releaseTime = 0.15
 } )
 
@@ -374,7 +374,7 @@ MKeyboard:RegisterInstrument( "Picked Bass", "sound/musical_keyboard/instruments
 { note = 64, fileName = "E4.ogg", loopStart = 1.994717, loopEnd = 2.006848 },
 { note = 65, fileName = "F4.ogg", loopStart = 1.996689, loopEnd = 2.002404 }
 }, {
-    volume = 0.5,
+    volume = 0.45,
     releaseTime = 0.15
 } )
 
@@ -390,7 +390,7 @@ MKeyboard:RegisterInstrument( "Slap Bass", "sound/musical_keyboard/instruments/s
 { note = 53, fileName = "F3.ogg", loopStart = 4.220159, loopEnd = 4.225941 },
 { note = 56, fileName = "G^3.ogg", loopStart = 0.775941, loopEnd = 0.780771 }
 }, {
-    volume = 0.6,
+    volume = 0.4,
     releaseTime = 0.15
 } )
 
@@ -406,7 +406,7 @@ MKeyboard:RegisterInstrument( "Marimba", "sound/musical_keyboard/instruments/mar
 { note = 89, fileName = "F6.ogg" },
 { note = 96, fileName = "C7.ogg" }
 }, {
-    volume = 0.45,
+    volume = 0.3,
     releaseTime = 0.3
 } )
 
@@ -419,7 +419,7 @@ MKeyboard:RegisterInstrument( "Vibraphone", "sound/musical_keyboard/instruments/
 { note = 76, fileName = "E5.ogg" },
 { note = 81, fileName = "A5.ogg" }
 }, {
-    volume = 0.5,
+    volume = 0.3,
     releaseTime = 0.3
 } )
 
@@ -434,7 +434,7 @@ MKeyboard:RegisterInstrument( "Flute", "sound/musical_keyboard/instruments/flute
     { note = 84, fileName = "C6.ogg", loopStart = 0.510862, loopEnd = 0.737256 },
     { note = 90, fileName = "F^6.ogg", loopStart = 0.425556, loopEnd = 0.679184 }
 }, {
-    volume = 0.38,
+    volume = 0.25,
     releaseTime = 0.1
 } )
 
@@ -448,7 +448,7 @@ MKeyboard:RegisterInstrument( "Piccolo", "sound/musical_keyboard/instruments/pic
 { note = 92, fileName = "G^6.ogg", loopStart = 0.664331, loopEnd = 0.905601 },
 { note = 96, fileName = "C7.ogg", loopStart = 0.646689, loopEnd = 0.888163 }
 }, {
-    volume = 0.38,
+    volume = 0.25,
     releaseTime = 0.2
 } )
 
@@ -462,7 +462,7 @@ MKeyboard:RegisterInstrument( "French Horn", "sound/musical_keyboard/instruments
 { note = 62, fileName = "D4.ogg", loopStart = 1.238487, loopEnd = 2.757366 },
 { note = 74, fileName = "D5.ogg", loopStart = 1.706853, loopEnd = 3.027762 }
 }, {
-    volume = 0.4,
+    volume = 0.3,
     releaseTime = 0.3
 } )
 
@@ -489,7 +489,7 @@ MKeyboard:RegisterInstrument( "Strings", "sound/musical_keyboard/instruments/str
 { note = 91, fileName = "G6.ogg", loopStart = 0.506916, loopEnd = 1.957937 },
 { note = 93, fileName = "A6.ogg", loopStart = 0.335964, loopEnd = 1.659206 }
 }, {
-    volume = 0.5,
+    volume = 0.3,
     releaseTime = 0.2
 } )
 
@@ -504,7 +504,7 @@ MKeyboard:RegisterInstrument( "Pizzicato Strings", "sound/musical_keyboard/instr
 { note = 79, fileName = "G5.ogg" },
 { note = 84, fileName = "C6.ogg" }
 }, {
-    volume = 0.5,
+    volume = 0.4,
     releaseTime = 0.3
 } )
 
@@ -525,7 +525,7 @@ MKeyboard:RegisterInstrument( "Choir Aahs", "sound/musical_keyboard/instruments/
     { note = 78, fileName = "F^5.ogg", loopStart = 0.468813, loopEnd = 1.725281 },
     { note = 81, fileName = "A5.ogg", loopStart = 0.831469, loopEnd = 2.320781 },
 }, {
-    volume = 0.55,
+    volume = 0.4,
     releaseTime = 0.6
 } )
 
@@ -540,7 +540,7 @@ local function AddInstrumentWithNoteRange( name, basePath, startNote, endNote, e
 end
 
 AddInstrumentWithNoteRange( "Standard Drums", "sound/musical_keyboard/instruments/drums_standard", 26, 87, ".mp3", {
-    volume = 0.4,
+    volume = 0.3,
     releaseTime = 0.5
 } )
 
