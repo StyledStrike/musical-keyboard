@@ -255,6 +255,7 @@ end
 
 do
     local cvarVolume = GetConVar( "volume" )
+    local cvarVolumeSfx = GetConVar( "volume_sfx" )
     local cvarMuteLoseFocus = GetConVar( "snd_mute_losefocus" )
 
     local Round = math.Round
@@ -268,7 +269,7 @@ do
         local RunJS = self.RunJS
 
         -- WebAudio bypasses Source Engine audio, so we need to apply volume console variables manually
-        local masterVolume = Round( cvarVolume:GetFloat(), 2 )
+        local masterVolume = Round( cvarVolume:GetFloat() * cvarVolumeSfx:GetFloat(), 2 )
 
         if cvarMuteLoseFocus:GetBool() and not system.HasFocus() then
             masterVolume = 0
