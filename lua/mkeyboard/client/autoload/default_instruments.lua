@@ -544,3 +544,25 @@ AddInstrumentWithNoteRange( "Standard Drums", "sound/musical_keyboard/instrument
     releaseTime = 0.5
 } )
 
+MKeyboard:RegisterInstrument( "Accordion", "sound/musical_keyboard/instruments/accordion", {
+{ note = 53, fileName = "F3.ogg", loopStart = 0.496168, loopEnd = 0.999456 },
+{ note = 55, fileName = "G3.ogg", loopStart = 0.421202, loopEnd = 0.839274 },
+{ note = 57, fileName = "A3.ogg", loopStart = 0.575306, loopEnd = 0.957120 },
+{ note = 59, fileName = "B3.ogg", loopStart = 0.621156, loopEnd = 0.945351 },
+{ note = 64, fileName = "E4.ogg", loopStart = 0.559070, loopEnd = 0.832404 },
+{ note = 65, fileName = "F4.ogg", loopStart = 0.819002, loopEnd = 1.094218 },
+{ note = 67, fileName = "G4.ogg", loopStart = 0.661587, loopEnd = 0.888889 },
+{ note = 69, fileName = "A4.ogg", loopStart = 0.306145, loopEnd = 0.542766 },
+{ note = 71, fileName = "B4.ogg", loopStart = 0.334422, loopEnd = 0.547415 },
+{ note = 72, fileName = "C5.ogg", loopStart = 0.311973, loopEnd = 0.554535 },
+{ note = 74, fileName = "D5.ogg", loopStart = 0.403401, loopEnd = 0.643469 },
+{ note = 77, fileName = "F5.ogg", loopStart = 0.528866, loopEnd = 0.714649 },
+{ note = 79, fileName = "G5.ogg", loopStart = 0.243628, loopEnd = 0.372404 },
+{ note = 82, fileName = "A^5.ogg", loopStart = 0.318844, loopEnd = 0.511383 },
+{ note = 83, fileName = "B5.ogg", loopStart = 0.165805, loopEnd = 0.325669 },
+{ note = 84, fileName = "C6.ogg", loopStart = 0.373175, loopEnd = 0.532653 },
+{ note = 88, fileName = "E6.ogg", loopStart = 0.336984, loopEnd = 0.490952 }
+}, {
+    volume = 0.4,
+    releaseTime = 0.05
+} )
