@@ -591,6 +591,40 @@ MKeyboard:RegisterInstrument( "Brass Section", "sound/musical_keyboard/instrumen
 { note = 76, fileName = "E5.ogg", loopStart = 2.266939, loopEnd = 6.008435 },
 { note = 84, fileName = "C6.ogg", loopStart = 2.266939, loopEnd = 6.008435 }
 }, {
-    volume = 0.35,
+    volume = 0.3,
     releaseTime = 0.1
+} )
+
+MKeyboard:RegisterInstrument( "Steel Guitar", "sound/musical_keyboard/instruments/steel_guitar", {
+{ note = 40, fileName = "E2.ogg" },
+{ note = 45, fileName = "A2.ogg" },
+{ note = 51, fileName = "D^3.ogg" },
+{ note = 60, fileName = "C4.ogg" },
+{ note = 63, fileName = "D^4.ogg" },
+{ note = 66, fileName = "F^4.ogg" },
+{ note = 69, fileName = "A4.ogg" },
+{ note = 72, fileName = "C5.ogg" },
+{ note = 75, fileName = "D^5.ogg" },
+{ note = 78, fileName = "F^5.ogg" },
+{ note = 81, fileName = "A5.ogg" },
+{ note = 84, fileName = "C6.ogg" }
+}, {
+    volume = 0.17,
+    releaseTime = 0.3
+} )
+
+MKeyboard:RegisterInstrument( "Fretless Bass", "sound/musical_keyboard/instruments/fretless_bass", {
+{ note = 29, fileName = "F1.ogg", loopStart = 1.196009, loopEnd = 1.218934 },
+{ note = 32, fileName = "G^1.ogg", loopStart = 1.512540, loopEnd = 1.531882 },
+{ note = 35, fileName = "B1.ogg", loopStart = 1.542562, loopEnd = 1.558776 },
+{ note = 38, fileName = "D2.ogg", loopStart = 1.775193, loopEnd = 1.802472 },
+{ note = 41, fileName = "F2.ogg", loopStart = 1.539274, loopEnd = 1.573651 },
+{ note = 44, fileName = "G^2.ogg", loopStart = 1.449637, loopEnd = 1.478571 },
+{ note = 47, fileName = "B2.ogg", loopStart = 1.625351, loopEnd = 1.657619 },
+{ note = 50, fileName = "D3.ogg", loopStart = 1.410454, loopEnd = 1.437732 },
+{ note = 53, fileName = "F3.ogg", loopStart = 1.542630, loopEnd = 1.565556 },
+{ note = 59, fileName = "B3.ogg", loopStart = 1.759955, loopEnd = 1.784172 }
+}, {
+    volume = 0.35,
+    releaseTime = 0.15
 } )
