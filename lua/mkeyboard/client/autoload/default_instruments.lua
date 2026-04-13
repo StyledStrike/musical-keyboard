@@ -628,3 +628,48 @@ MKeyboard:RegisterInstrument( "Fretless Bass", "sound/musical_keyboard/instrumen
     volume = 0.35,
     releaseTime = 0.15
 } )
+
+MKeyboard:RegisterInstrument( "Jazz Organ", "sound/musical_keyboard/instruments/jazz_organ", {
+{ note = 55, fileName = "G3.ogg", loopStart = 1.252562, loopEnd = 2.833424 },
+{ note = 60, fileName = "C4.ogg", loopStart = 1.188912, loopEnd = 2.687596 },
+{ note = 67, fileName = "G4.ogg", loopStart = 0.512971, loopEnd = 1.992562 },
+{ note = 72, fileName = "C5.ogg", loopStart = 0.857914, loopEnd = 2.207302 },
+{ note = 79, fileName = "G5.ogg", loopStart = 0.729138, loopEnd = 2.190862 },
+{ note = 84, fileName = "C6.ogg", loopStart = 0.444558, loopEnd = 1.983379 },
+{ note = 91, fileName = "G6.ogg", loopStart = 0.354830, loopEnd = 2.331882 },
+{ note = 96, fileName = "C7.ogg", loopStart = 0.256893, loopEnd = 2.003265 }
+}, {
+    volume = 0.3,
+    releaseTime = 0.15
+} )
+
+MKeyboard:RegisterInstrument( "Violin", "sound/musical_keyboard/instruments/violin", {
+{ note = 55, fileName = "G3.ogg", loopStart = 0.958118, loopEnd = 2.737891 },
+{ note = 57, fileName = "A3.ogg", loopStart = 1.617347, loopEnd = 2.625510 },
+{ note = 58, fileName = "A^3.ogg", loopStart = 1.657710, loopEnd = 2.470136 },
+{ note = 59, fileName = "B3.ogg", loopStart = 1.754898, loopEnd = 2.272517 },
+{ note = 61, fileName = "C^4.ogg", loopStart = 2.669206, loopEnd = 3.015170 },
+{ note = 63, fileName = "D^4.ogg", loopStart = 2.645465, loopEnd = 2.981927 },
+{ note = 64, fileName = "E4.ogg", loopStart = 2.522789, loopEnd = 2.689229 },
+{ note = 65, fileName = "F4.ogg", loopStart = 1.883537, loopEnd = 2.055488 },
+{ note = 66, fileName = "F^4.ogg", loopStart = 2.199705, loopEnd = 2.372744 },
+{ note = 68, fileName = "G^4.ogg", loopStart = 1.806621, loopEnd = 2.139796 },
+{ note = 70, fileName = "A^4.ogg", loopStart = 2.479478, loopEnd = 2.652902 },
+{ note = 71, fileName = "B4.ogg", loopStart = 1.850091, loopEnd = 2.022404 },
+{ note = 73, fileName = "C^5.ogg", loopStart = 2.079138, loopEnd = 2.253583 },
+{ note = 75, fileName = "D^5.ogg", loopStart = 1.652857, loopEnd = 1.832245 },
+{ note = 77, fileName = "F5.ogg", loopStart = 2.167664, loopEnd = 2.355170 },
+{ note = 79, fileName = "G5.ogg", loopStart = 2.607937, loopEnd = 2.989138 },
+{ note = 80, fileName = "G^5.ogg", loopStart = 1.900295, loopEnd = 2.594014 },
+{ note = 82, fileName = "A^5.ogg", loopStart = 1.752200, loopEnd = 2.400522 },
+{ note = 83, fileName = "B5.ogg", loopStart = 1.589705, loopEnd = 1.779796 },
+{ note = 84, fileName = "C6.ogg", loopStart = 2.146054, loopEnd = 2.816213 },
+{ note = 87, fileName = "D^6.ogg", loopStart = 1.567937, loopEnd = 2.587687 },
+{ note = 90, fileName = "F^6.ogg", loopStart = 1.111066, loopEnd = 2.428798 },
+{ note = 91, fileName = "G6.ogg", loopStart = 0.804354, loopEnd = 2.022132 },
+{ note = 94, fileName = "A^6.ogg", loopStart = 1.068435, loopEnd = 2.335261 },
+{ note = 95, fileName = "B6.ogg", loopStart = 1.072426, loopEnd = 2.609615 }
+}, {
+    volume = 0.3,
+    releaseTime = 0.15
+} )
