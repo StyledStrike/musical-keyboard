@@ -217,7 +217,7 @@ function MKeyboard.EntityPlayNote( ent, channelIndex, note, velocity, instrument
     ent.rangedEmitter.activeNotes[note] = isAutomated and "automated" or "manual"
 end
 
-function MKeyboard.EntityStopNote( ent, channelIndex, note )
+function MKeyboard.EntityStopNote( ent, channelIndex, note, additionalReleaseTime )
     if not IsValid( ent ) then return end
     if not ent.rangedEmitter then return end
 
@@ -237,7 +237,9 @@ function MKeyboard.EntityStopNote( ent, channelIndex, note )
         releaseTime = instrument.params.releaseTime
     end
 
-    emitter:DestroySource( playingNote.sourceId, releaseTime )
+    additionalReleaseTime = additionalReleaseTime or 0.0
+
+    emitter:DestroySource( playingNote.sourceId, releaseTime + additionalReleaseTime )
 
     ent.rangedEmitter.activeNotes[note] = nil
 end

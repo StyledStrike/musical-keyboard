@@ -71,7 +71,7 @@ local function ProcessPlaybackQueue( ent, rangedEmitter )
             -- Mark from removal from the queue
             removeIndexes[index] = true
 
-            EntityStopNote( ent, event.channelIndex, event.note )
+            EntityStopNote( ent, event.channelIndex, event.note, event.additionalReleaseTime )
         end
     end
 

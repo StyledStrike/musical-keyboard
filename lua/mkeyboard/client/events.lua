@@ -74,10 +74,10 @@ function MKeyboard:Activate( ent )
         transmitBuffer[transmitCount] = event
     end
 
-    self.frame.OnNoteReleased = function( _, channelIndex, note )
+    self.frame.OnNoteReleased = function( _, channelIndex, note, additionalReleaseTime )
         -- Passthrough local note release events to our local entity
         if IsValid( self.entity ) then
-            self.EntityStopNote( self.entity, channelIndex, note )
+            self.EntityStopNote( self.entity, channelIndex, note, additionalReleaseTime )
         end
 
         -- Remove all note press events if the buffer is full
@@ -98,7 +98,8 @@ function MKeyboard:Activate( ent )
         local event = {
             time = CurTime(), -- The time when the note was released
             note = note,
-            channelIndex = channelIndex
+            channelIndex = channelIndex,
+            additionalReleaseTime = additionalReleaseTime
         }
 
         transmitCount = transmitCount + 1

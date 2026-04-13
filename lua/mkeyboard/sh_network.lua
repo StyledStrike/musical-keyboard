@@ -46,6 +46,8 @@ do
                 WriteUInt( event.instrumentIndex, 7 )
                 WriteUInt( event.velocity, 7 )
                 WriteBool( event.isAutomated )
+            else
+                WriteFloat( Clamp( event.additionalReleaseTime or 0, 0, 0.8 ) )
             end
         end
     end
@@ -83,6 +85,8 @@ do
                 event.instrumentIndex = ReadUInt( 7 )
                 event.velocity = ReadUInt( 7 )
                 event.isAutomated = ReadBool()
+            else
+                event.additionalReleaseTime = ReadFloat()
             end
 
             events[i] = event

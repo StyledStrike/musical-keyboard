@@ -157,7 +157,7 @@ function PANEL:Init()
     sliderKeyboardVelocity.PerformLayout = FormSliderLayout
     sliderKeyboardVelocity.Label:SetFont( "MKeyboard_Small" )
 
-    -- Keyboard piano transpose
+    -- Keyboard - Piano transpose
     local sliderKeyboardTranspose = StyledTheme.CreateFormSlider( settingsScroll, "#musicalk.vkeys.transpose", Config.keyboardTranspose, -48, 48, 0, function( value )
         self:SetKeyboardTranspose( value )
     end )
@@ -165,6 +165,16 @@ function PANEL:Init()
     self.sliderKeyboardTranspose = sliderKeyboardTranspose
     sliderKeyboardTranspose.PerformLayout = FormSliderLayout
     sliderKeyboardTranspose.Label:SetFont( "MKeyboard_Small" )
+
+    -- Keyboard - Additional note release time
+    local sliderKeyboardRelease = StyledTheme.CreateFormSlider( settingsScroll, "#musicalk.vkeys.release_time", Config.keyboardNoteReleaseTime, 0.0, 0.8, 2, function( value )
+        Config.keyboardNoteReleaseTime = value
+        Config:Save()
+    end )
+
+    self.sliderKeyboardRelease = sliderKeyboardRelease
+    sliderKeyboardRelease.PerformLayout = FormSliderLayout
+    sliderKeyboardRelease.Label:SetFont( "MKeyboard_Small" )
 
     -- Should labels be visible on the piano roll?
     local toggleLabels = StyledTheme.CreateFormToggle( settingsScroll, "#musicalk.vkeys.labels", Config.drawButtonLabels, function( value )
@@ -246,7 +256,7 @@ function PANEL:Init()
 end
 
 function PANEL:OnNotePressed( _channelIndex, _note, _velocity, _instrumentIndex, _isAutomated ) end
-function PANEL:OnNoteReleased( _channelIndex, _note ) end
+function PANEL:OnNoteReleased( _channelIndex, _note, _additionalReleaseTime ) end
 function PANEL:OnReleaseAllNotes() end
 
 function PANEL:OnRemove()
@@ -501,8 +511,8 @@ function PANEL:PressNote( channelIndex, note, velocity, instrumentIndex, isAutom
     self:OnNotePressed( channelIndex, note, velocity, instrumentIndex, isAutomated )
 end
 
-function PANEL:ReleaseNote( channelIndex, note )
-    self:OnNoteReleased( channelIndex, note )
+function PANEL:ReleaseNote( channelIndex, note, additionalReleaseTime )
+    self:OnNoteReleased( channelIndex, note, additionalReleaseTime )
 end
 
 function PANEL:OnKeyboardPressButton( button )
@@ -518,13 +528,13 @@ function PANEL:OnKeyboardReleaseButton( button )
     local note = self.layoutShiftedButtonNotes[button]
 
     if note then
-        self:ReleaseNote( 1, note + Config.keyboardTranspose )
+        self:ReleaseNote( 1, note + Config.keyboardTranspose, Config.keyboardNoteReleaseTime )
     end
 
     note = self.layoutUnshiftedButtonNotes[button]
 
     if note then
-        self:ReleaseNote( 1, note + Config.keyboardTranspose )
+        self:ReleaseNote( 1, note + Config.keyboardTranspose, Config.keyboardNoteReleaseTime )
     end
 end
 
