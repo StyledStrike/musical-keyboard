@@ -164,6 +164,10 @@ hook.Add( "MIDI", "MKeyboard.CaptureMIDIEvents", function( _, code, p1, p2 )
 
     local Config = MKeyboard.Config
 
+    if cmd == "NOTE_ON" and p2 == 0 then
+        cmd = "NOTE_OFF"
+    end
+
     if cmd == "NOTE_ON" and p2 > 0 then
         local channel = midi.GetCommandChannel( code )
         local instrumentIndex = Config:GetInstrumentFromCurrentChannelMap( channel )
