@@ -452,7 +452,6 @@ class Emitter extends DestroyableObject {
         super.destroy();
 
         // Disconnect and remove all nodes from our audio graph
-        // Disconnect and remove all nodes from our audio graph
         for (const nodeId in this.audioGraph) {
             this.audioGraph[nodeId].disconnect();
             delete this.audioGraph[nodeId];
@@ -518,15 +517,15 @@ class Emitter extends DestroyableObject {
         const pannerNode = this.audioGraph["panner"];
 
         pannerNode.maxDistance = maxDistance;
-        pannerNode.refDistance = 1.0;
-        pannerNode.rolloffFactor = 2.0;
+        pannerNode.refDistance = 2.0;
+        pannerNode.rolloffFactor = 1.5;
 
         const convolverPannerNode = this.audioGraph["convolverPanner"];
 
         if (convolverPannerNode) {
             convolverPannerNode.maxDistance = maxDistance;
             convolverPannerNode.refDistance = 1.0;
-            convolverPannerNode.rolloffFactor = 3.0;
+            convolverPannerNode.rolloffFactor = 1.0;
         }
     }
 

@@ -1,4 +1,5 @@
 local MAX_PROCESSING_DISTANCE = MKeyboard.MAX_PROCESSING_DISTANCE
+local Config = MKeyboard.Config
 
 --[[
     A utility class used to automatically create/destroy
@@ -35,7 +36,8 @@ function RangedEmitter:Activate()
 
     if not self.emitter then
         self.emitter = MKeyboard.WebAudio.CreateEmitter()
-        self.emitter:SetMaxDistance( MAX_PROCESSING_DISTANCE )
+        self.emitter._rangedEmitter = self
+        self:UpdateMaxDistance()
     end
 
     local ent = self.ent
@@ -44,6 +46,12 @@ function RangedEmitter:Activate()
     local ir = MKeyboard.impulseResponses[ent:GetImpulseResponseIndex()]
     self.emitter:SetImpulseResponseAudioFile( ir ~= nil and ir.fileName )
     self.emitter:SetHRTFEnabled( ent:GetHRTFEnabled() )
+end
+
+function RangedEmitter:UpdateMaxDistance()
+    if self.emitter then
+        self.emitter:SetMaxDistance( MAX_PROCESSING_DISTANCE * ( Config.earmuffMode and 0.2 or 0.75  ) )
+    end
 end
 
 function RangedEmitter:Deactivate()

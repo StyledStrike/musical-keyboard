@@ -9,6 +9,7 @@ function Config:Reset()
     -- Interface options
     self.drawButtonLabels = true
     self.sortSheetsAlphabetically = false
+    self.earmuffMode = false
 
     -- Options for playing with a PC keyboard
     self.keyboardVelocity = 127
@@ -42,6 +43,7 @@ function Config:Save( immediate )
 
         drawButtonLabels = self.drawButtonLabels,
         sortSheetsAlphabetically = self.sortSheetsAlphabetically,
+        earmuffMode = self.earmuffMode,
 
         keyboardVelocity = self.keyboardVelocity,
         keyboardTranspose = self.keyboardTranspose,
@@ -83,6 +85,7 @@ function Config:Load()
 
     LoadBool( "drawButtonLabels", self.drawButtonLabels )
     LoadBool( "sortSheetsAlphabetically", self.sortSheetsAlphabetically )
+    LoadBool( "earmuffMode", self.earmuffMode )
 
     SetNumber( self, "keyboardVelocity", data.keyboardVelocity, 1, 127, self.keyboardVelocity )
     SetNumber( self, "keyboardTranspose", data.keyboardTranspose, -48, 48, self.keyboardTranspose )

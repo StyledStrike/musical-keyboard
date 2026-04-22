@@ -196,6 +196,27 @@ function PANEL:Init()
     toggleSortSheets:SetTall( ROW_HEIGHT )
     toggleSortSheets:SetFont( "MKeyboard_Small" )
 
+    -- Other keyboard settings
+    AddSeparator( "#musicalk.other" )
+
+    local toggleEarmuffMode = StyledTheme.CreateFormToggle( settingsScroll, "#musicalk.other.earmuff_mode", Config.earmuffMode, function( value )
+        Config.earmuffMode = value
+        Config:Save()
+
+        -- Update active `RangedEmitter`s with the new distance
+        local emitterInstances = MKeyboard.WebAudio.emitterInstances
+        if not emitterInstances then return end
+
+        for _, emitter in pairs( emitterInstances ) do
+            if emitter._rangedEmitter then
+                emitter._rangedEmitter:UpdateMaxDistance()
+            end
+        end
+    end )
+
+    toggleEarmuffMode:SetTall( ROW_HEIGHT )
+    toggleEarmuffMode:SetFont( "MKeyboard_Small" )
+
     -- MIDI settings
     AddSeparator( "MIDI" )
 
