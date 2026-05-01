@@ -141,7 +141,7 @@ if CLIENT then
 
     StyledTheme.RegisterFont( "MKeyboard_Small", 0.015, {
         font = "Roboto",
-        weight = 600,
+        weight = system.IsLinux() and 600 or 300,
     } )
 
     -- Shared files
