@@ -66,6 +66,9 @@ This array contains:
         self.wireReproduceEvents = {}
         self.wireReproduceLastId = 0
 
+        self.notePressOutputTable = {}
+        self.noteReleaseOutputTable = {}
+
         self.wireTransmitBuffer = {}
         self.wireTransmitCount = 0
         self.wireNextTransmitTime = 0
@@ -161,9 +164,6 @@ local TRANSMIT_BUFFER_INTERVAL = MKeyboard.TRANSMIT_BUFFER_INTERVAL
 local TriggerOutput = WireLib.TriggerOutput
 local GetNearbyPlayers = MKeyboard.GetNearbyPlayers
 
-local notePressOutputTable = {}
-local noteReleaseOutputTable = {}
-
 function ENT:ProcessServerNotes( t )
     -- We do a similar "note transmit" logic used on the client-side,
     -- but our source of events are Wire inputs.
@@ -196,6 +196,7 @@ function ENT:ProcessServerNotes( t )
         if t >= event.time and event.instrumentIndex then
             reproduceEvents[id] = nil
 
+            local notePressOutputTable = self.notePressOutputTable
             notePressOutputTable[1] = event.note
             notePressOutputTable[2] = event.velocity
             notePressOutputTable[3] = event.channelIndex
@@ -211,6 +212,7 @@ function ENT:ProcessServerNotes( t )
         if t >= event.time and not event.instrumentIndex then
             reproduceEvents[id] = nil
 
+            local noteReleaseOutputTable = self.noteReleaseOutputTable
             noteReleaseOutputTable[1] = event.note
             noteReleaseOutputTable[2] = event.channelIndex
             noteReleaseOutputTable[3] = event.time
