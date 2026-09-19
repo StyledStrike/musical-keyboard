@@ -181,6 +181,13 @@ function MKeyboard:Activate( ent )
         end
     end )
 
+    hook.Add( "EntityEmitSound", "MKeyboard.QuietSounds", function( data )
+        if data.Volume then
+            data.Volume = data.Volume * 0.25
+            return true
+        end
+    end )
+
     -- Custom Chat compatibility
     if CustomChat then
         hook.Add( "CustomChatBlockInput", "MKeyboard.PreventOpeningChat", function()
@@ -210,6 +217,7 @@ function MKeyboard:Deactivate()
     hook.Remove( "PlayerButtonUp", "MKeyboard.DetectButtonRelease" )
     hook.Remove( "HUDShouldDraw", "MKeyboard.HideHUD" )
     hook.Remove( "PlayerBindPress", "MKeyboard.BlockBinds" )
+    hook.Remove( "EntityEmitSound", "MKeyboard.QuietSounds" )
 
     hook.Remove( "CustomChatBlockInput", "MKeyboard.PreventOpeningChat" )
     hook.Remove( "StartChat", "MKeyboard.PreventOpeningChat" )
