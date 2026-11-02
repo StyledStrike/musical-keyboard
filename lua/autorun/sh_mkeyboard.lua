@@ -32,20 +32,15 @@ CreateConVar(
 )
 
 do
-    local isDeveloperActive = false
+    local isDeveloperActive = cvars.Bool( "developer" )
 
     function MKeyboard.GetDevMode()
         return isDeveloperActive
     end
 
-    -- Using `cvars.AddChangeCallback` is unreliable serverside,
-    -- so we will check it periodically instead.
-    local cvarDeveloper = GetConVar( "developer" )
-    isDeveloperActive = cvarDeveloper:GetBool()
-
-    timer.Create( "MKeyboard.CheckDeveloperConvar", 3, 0, function()
-        isDeveloperActive = cvarDeveloper:GetBool()
-    end )
+    cvars.AddChangeCallback( "developer", function( convar, old, new )
+        isDeveloperActive = cvars.Bool( "developer" )
+    end)
 
     local COLOR_TAG = Color( 255, 255, 255 )
     local COLOR_SV = Color( 3, 169, 244 )
