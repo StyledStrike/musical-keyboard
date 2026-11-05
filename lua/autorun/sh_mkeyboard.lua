@@ -38,9 +38,9 @@ do
         return isDeveloperActive
     end
 
-    cvars.AddChangeCallback( "developer", function( convar, old, new )
-        isDeveloperActive = cvars.Bool( "developer" )
-    end)
+    cvars.AddChangeCallback( "developer", function( _, _, newValue  )
+        isDeveloperActive = tobool( newValue )
+    end )
 
     local COLOR_TAG = Color( 255, 255, 255 )
     local COLOR_SV = Color( 3, 169, 244 )
