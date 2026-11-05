@@ -38,7 +38,7 @@ do
         return isDeveloperActive
     end
 
-    cvars.AddChangeCallback( "developer", function( _, _, newValue  )
+    cvars.AddChangeCallback( "developer", function( _, _, newValue )
         isDeveloperActive = tobool( newValue )
     end )
 
